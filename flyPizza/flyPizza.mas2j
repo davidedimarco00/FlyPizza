@@ -12,7 +12,7 @@
 
 MAS flyPizza {
 
-    environment: env.FlyPizzaEnv()
+    environment: env.FlyPizzaEnv(gui)
 
     agents: agent1;
             agent2;
