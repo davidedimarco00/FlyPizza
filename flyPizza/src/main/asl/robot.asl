@@ -1,1 +1,2 @@
 //agent Robot
+//Initial beliefs
