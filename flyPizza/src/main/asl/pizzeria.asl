@@ -1,6 +1,7 @@
 //pizzeria.asl
 //Initial beliefs
 
+
 open(pizzeria).
 droneAvailable(5).
 
@@ -8,8 +9,11 @@ droneAvailable(5).
 
 +numberOfAvailablePizzas(X) <- !check_pizza(X).
 
+//Initial goals
 !start.
 
+
+//Plans
 
 +!check_pizza(X): true <-
     .print("Pizze disponibili: ",X).
