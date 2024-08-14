@@ -14,8 +14,7 @@ MAS flyPizza {
 
     environment: env.FlyPizzaEnv(gui)
 
-    agents: agent1;
-            agent2;
+     agents: drone1 drone; drone2 drone; drone3 drone; drone4 drone; drone5 drone; pizzeria pizzeria; robot robot;
 
     aslSourcePath: "src/main/asl";
 }

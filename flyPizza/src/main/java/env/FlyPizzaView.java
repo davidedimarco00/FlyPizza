@@ -1,85 +1,89 @@
 package env;
 
+import env.objects.ObjectsID;
 import jason.environment.grid.GridWorldView;
 import jason.environment.grid.Location;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.util.Set;
 import javax.swing.SwingUtilities;
 
-/**
- * Jason provides a convenient GridWorldView class representing the view of a
- * square environment consisting of a grid of tiles. Less conveniently, the
- * Javadoc is almost useless thus you should figure out by yourself (e.g. by
- * looking at comments in examples source code) how the things work.
- */
 public class FlyPizzaView extends GridWorldView {
-
-    FlyPizzaModel hmodel;
+    FlyPizzaModel model;
 
     public FlyPizzaView(final FlyPizzaModel model) {
-        super(model, "FlyPizza", 700);
-        this.hmodel = model;
-        this.defaultFont = new Font("Arial", Font.BOLD, 16); // change default font
+        super(model, "FlyPizza", 1000);
+        this.model = model;
+        this.defaultFont = new Font("Helvetica", Font.BOLD, 14); // change default font
         SwingUtilities.invokeLater(() -> {
             this.setVisible(true);
             this.repaint();
         });
+
     }
 
     private static final Location copyOf(final Location l) {
         return new Location(l.x, l.y);
     }
 
-    /** draw application objects */
     @Override
     public void draw(final Graphics g, final int x, final int y, final int object) {
-        final Location lRobot = copyOf(this.hmodel.getAgPos(0));
-        final Location lFridge = copyOf(this.hmodel.lFridge);
-        final Location lOwner = copyOf(this.hmodel.lOwner);
-        
-        final int availableBeers = this.hmodel.availableBeers;
-        final int sipCount = this.hmodel.sipCount;
-        SwingUtilities.invokeLater(() -> {
-            super.drawAgent(g, x, y, Color.lightGray, -1);
-            switch (object) {
-                case FlyPizzaModel.FRIDGE:
-                    if (lRobot.equals(lFridge)) {
-                        super.drawAgent(g, x, y, Color.yellow, -1);
-                    }
-                    g.setColor(Color.black);
-                    this.drawString(g, x, y, this.defaultFont, "Fridge (" + availableBeers + ")");
+
+        //draw obstacles
+        Set<Location> locationSet = this.model.getObstacles();
+        locationSet.forEach(t -> {
+            this.drawObstacle(g, t.x, t.y);
+        });
+        //get object ids and print them in the grid
+        ObjectsID id = ObjectsID.fromValue(object);
+
+
+
+            switch (id) {
+                case CHARGING_BASE1, CHARGING_BASE3, CHARGING_BASE2:
+                    g.setColor(Color.blue);
+                    this.drawString(g, x, y + 1, this.defaultFont, id.getObjectStringName());
+                    super.drawAgent(g, x, y, Color.blue, -1);
                     break;
-                case FlyPizzaModel.OWNER:
-                    if (lRobot.equals(lOwner)) {
-                        super.drawAgent(g, x, y, Color.yellow, -1);
-                    }
-                    String o = "Owner";
-                    if (sipCount > 0) {
-                        o += " (" + sipCount + ")";
-                    }
-                    g.setColor(Color.black);
-                    this.drawString(g, x, y, this.defaultFont, o);
+                case PIZZERIA:
+                    g.setColor(Color.RED);
+                    this.drawString(g, x, y - 1, this.defaultFont, "Pizzeria (" + this.model.numberOfAvailablePizzas + ")");
+                    super.drawAgent(g, x, y, Color.red, -1);
+                    break;
+                case GARAGE:
+                    g.setColor(Color.magenta);
+                    this.drawString(g, x-3, y , this.defaultFont, "Garage (" + this.model.numberOfDroneInGarage + ")");
+                    super.drawAgent(g, x, y, Color.magenta, -1);
+                    break;
+                case ROBOT:
+                    g.setColor(Color.GRAY);
+                    this.drawString(g, x + 3, y, this.defaultFont, "Robot (" + this.model.robotBatteryLevel + ")");
+                    super.drawAgent(g, x, y, Color.gray, -1);
+
                     break;
                 default:
                     break;
             }
-        });
+
+
+
+
+
+
+
     }
 
     @Override
     public void drawAgent(final Graphics g, final int x, final int y, Color c, final int id) {
-        final Location lRobot = copyOf(this.hmodel.getAgPos(0));
-        final Location lFridge = copyOf(this.hmodel.lFridge);
-        final Location lOwner = copyOf(this.hmodel.lOwner);
-        final boolean carryingBeer = this.hmodel.carryingBeer;
-        SwingUtilities.invokeLater(() -> {
-            if (!lRobot.equals(lOwner) && !lRobot.equals(lFridge)) {
-                super.drawAgent(g, x, y, carryingBeer ? Color.orange : Color.yellow, -1);
-                g.setColor(Color.black);
-                super.drawString(g, x, y, this.defaultFont, "Robot");
-            }
-        });
-    }
-}
 
+        Location loc = copyOf(model.getAgPos(id));
+
+        if (!loc.equals(this.model.chargingBase1.getLocation()) && !loc.equals(this.model.chargingBase2.getLocation()) && !loc.equals(this.model.chargingBase3.getLocation()) &&
+        !loc.equals(this.model.pizzeria.getLocation()) && !loc.equals(this.model.garage.getLocation() ) && !loc.equals(this.model.robot.getLocation() )  ) {
+            super.drawAgent(g, x, y,  Color.black, -1);
+            g.setColor(Color.black);
+        }
+    }
+
+}
