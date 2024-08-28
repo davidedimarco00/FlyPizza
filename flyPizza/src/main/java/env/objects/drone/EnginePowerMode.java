@@ -5,11 +5,11 @@ public enum EnginePowerMode {
     LOW("LOW", 0.4);
 
     private String mode;
-    private double batteryFactor;
+    private double batteryDrainRate;
 
     EnginePowerMode(String mode, double batteryDrainRate) {
         this.mode = mode;
-        this.batteryFactor = batteryDrainRate;
+        this.batteryDrainRate = batteryDrainRate;
     }
 
     public String getMode() {
@@ -17,7 +17,7 @@ public enum EnginePowerMode {
     }
 
     public double getBatteryDrainRate() {
-        return this.batteryFactor;
+        return this.batteryDrainRate;
     }
 
 
@@ -25,7 +25,7 @@ public enum EnginePowerMode {
     public String toString() {
         return "EnginePowerMode{" +
                 "mode='" + mode + '\'' +
-                ", batteryFactor=" + batteryFactor +
+                ", batteryDrainRate=" + batteryDrainRate +
                 '}';
     }
 }

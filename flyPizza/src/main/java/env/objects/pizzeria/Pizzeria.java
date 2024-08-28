@@ -6,6 +6,7 @@ import jason.environment.grid.Location;
 public class Pizzeria {
 
     private final Location location;
+    private final int MAX_PIZZAS = 80;
     private int numberOfPizzas = 40;
     private int id;
 

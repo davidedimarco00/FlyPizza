@@ -10,10 +10,17 @@ public class Garage {
     private final int TOTAL_PARKING = 5;
     private int availableParking = 5; //il garage ha 5 posti per i 5 droni
 
+    private boolean[] occupiedList = {false, false, false};
+
 
     public Garage(Location location, int id) {
         this.location = location;
         this.id = id;
+    }
+
+
+    public void setParkingOccupied(int index, boolean value) {
+        occupiedList[index] = value;
     }
 
     public int getAvailableParking() {
