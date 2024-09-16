@@ -57,17 +57,14 @@ public class NavigationManager {
         // is robot, pizza or garage location?
         return isChargingBase ||
                 loc.equals(model.getPizzeria().getLocation()) ||
-                loc.equals(model.getGarage().getLocation()) ||
                 loc.equals(model.getRobot().getLocation());
     }
 
     private Location moveAroundTheObstacle(Location dest, int agentId) {
         Location agentPosition = model.getAgPos(agentId);
-
         boolean randomDirection = random.nextBoolean();
         int newx = 0;
         int newy = 0;
-
         if(agentPosition.y < dest.y) {
             newy = agentPosition.y + 1;
             if(agentPosition.x == dest.x) {

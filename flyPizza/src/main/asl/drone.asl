@@ -8,8 +8,6 @@ pizzeriaLocation(26,26).
 
 
 
-
-
 +!start <-
     //.print("Drone pronto per ricevere la destinazione, mi trovo nel garage");
     +at(pizzeria);
@@ -49,8 +47,6 @@ pizzeriaLocation(26,26).
     -atDestination(true);
     -order(Drone, X, Y);
     !moveToPizzeria(D, LocX, LocY).
-
-
 
 
 

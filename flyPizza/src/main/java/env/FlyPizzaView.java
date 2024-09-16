@@ -51,11 +51,6 @@ public class FlyPizzaView extends GridWorldView {
 
                 super.drawAgent(g, x, y, Color.red, -1);
                 break;
-            case GARAGE:
-                g.setColor(Color.magenta);
-                //this.drawString(g, x-3, y , this.defaultFont, "Garage (" + this.model.numberOfDroneInGarage + ")");
-                super.drawAgent(g, x, y, Color.magenta, -1);
-                break;
             case ROBOT:
                 g.setColor(Color.ORANGE);
                 //this.drawString(g, x + 3, y, this.defaultFont, "Robot (" + this.model.robotBatteryLevel + ")");
@@ -79,7 +74,6 @@ public class FlyPizzaView extends GridWorldView {
                 !loc.equals(this.model.getChargingBases().get(1).getLocation()) &&
                 !loc.equals(this.model.getChargingBases().get(2).getLocation()) &&
                 !loc.equals(this.model.getPizzeria().getLocation()) &&
-                !loc.equals(this.model.getGarage().getLocation()) &&
                 !loc.equals(this.model.getRobot().getLocation())) {
 
             c = Color.BLACK;

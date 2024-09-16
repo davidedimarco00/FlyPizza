@@ -4,7 +4,6 @@ import env.behavior.NavigationManager;
 import env.objects.ObjectsID;
 import env.objects.chargingBase.ChargingBase;
 import env.objects.chargingBase.ChargingBaseStatus;
-import env.objects.garage.Garage;
 import env.objects.pizzeria.Pizzeria;
 import env.objects.robot.RescueRobot;
 import env.objects.robot.RobotStatus;
@@ -20,7 +19,6 @@ public class FlyPizzaModel extends GridWorldModel {
     private Set<Location> obstacles = new HashSet<>();
     private List<ChargingBase> chargingBases = new ArrayList<>();
 
-    private Garage garage = new Garage(new Location(25, 26), ObjectsID.GARAGE.getId());
     private Pizzeria pizzeria = new Pizzeria(new Location(26, 26), ObjectsID.PIZZERIA.getId());
     private RescueRobot robot = new RescueRobot(new Location(27, 26), 100, RobotStatus.AVAILABLE, ObjectsID.ROBOT.getId());
 
@@ -85,7 +83,6 @@ public class FlyPizzaModel extends GridWorldModel {
         }
         //Add other object in the map
         this.add(ObjectsID.PIZZERIA.getValue(), pizzeria.getLocation());
-        this.add(ObjectsID.GARAGE.getValue(), garage.getLocation());
         this.add(ObjectsID.ROBOT.getValue(), robot.getLocation());
     }
 
@@ -123,10 +120,6 @@ public class FlyPizzaModel extends GridWorldModel {
 
     public List<ChargingBase> getChargingBases() {
         return chargingBases;
-    }
-
-    public Garage getGarage() {
-        return garage;
     }
 
     public Pizzeria getPizzeria() {
