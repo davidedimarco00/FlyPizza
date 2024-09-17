@@ -60,9 +60,7 @@ public class FlyPizzaEnv extends Environment {
             for (ChargingBase base : this.model.getChargingBases()) {
                 this.addPercept(droneName, Literal.parseLiteral("chargingBase(" + base.getName() + "," + base.getLocation().x + "," + base.getLocation().y + ")"));
             }
-
         }
-
         this.clearPercepts(ObjectsID.PIZZERIA.getObjectStringName());
         this.clearPercepts(ObjectsID.ROBOT.getObjectStringName());
     }
@@ -93,7 +91,7 @@ public class FlyPizzaEnv extends Environment {
 
         }
         else if (action.getFunctor().equals("pizza_delivered")) {
-            logger.log(Level.INFO, "Sono qui");
+            logger.log(Level.INFO, "Ho deliverato una pizza");
             this.model.getPizzeria().removePizzas(1);
         }
 

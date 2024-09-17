@@ -69,7 +69,7 @@ public class FlyPizzaModel extends GridWorldModel {
             Location location;
             do {
                 location = new Location(random.nextInt(GSize), random.nextInt(GSize));
-            } while (occupiedLocations.contains(location));
+            } while (occupiedLocations.contains(location) || isNearPizzeria(location));
             obstacles.add(location);
             occupiedLocations.add(location);
         }
@@ -84,6 +84,13 @@ public class FlyPizzaModel extends GridWorldModel {
         //Add other object in the map
         this.add(ObjectsID.PIZZERIA.getValue(), pizzeria.getLocation());
         this.add(ObjectsID.ROBOT.getValue(), robot.getLocation());
+    }
+
+    private boolean isNearPizzeria(Location loc) {
+        Location pizzeriaLoc = pizzeria.getLocation();
+        int dx = Math.abs(loc.x - pizzeriaLoc.x);
+        int dy = Math.abs(loc.y - pizzeriaLoc.y);
+        return dx <= 2 && dy <= 2;
     }
 
     public void moveTowards(final Location dest, final int agentId) {
