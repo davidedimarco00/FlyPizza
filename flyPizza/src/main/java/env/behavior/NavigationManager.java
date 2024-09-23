@@ -50,13 +50,7 @@ public class NavigationManager {
     }
 
     private boolean isAllowedPosition(Location loc) {
-        //controlla se la posizione è una delle basi di ricarica
-        boolean isChargingBase = model.getChargingBases().stream()
-                .anyMatch(base -> base.getLocation().equals(loc));
-
-        // is robot, pizza or garage location?
-        return isChargingBase ||
-                loc.equals(model.getPizzeria().getLocation()) ||
+        return loc.equals(model.getPizzeria().getLocation()) ||
                 loc.equals(model.getRobot().getLocation());
     }
 

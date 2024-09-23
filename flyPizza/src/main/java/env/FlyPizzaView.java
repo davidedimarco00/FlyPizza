@@ -69,9 +69,7 @@ public class FlyPizzaView extends GridWorldView {
             //super.drawAgent(g, x, y, c, id);
         } else {
             // Verifica se la posizione è una posizione speciale
-            boolean isSpecialLocation = model.getChargingBases().stream().anyMatch(base -> base.getLocation().equals(loc))
-                    || loc.equals(model.getPizzeria().getLocation())
-                    || loc.equals(model.getRobot().getLocation());
+            boolean isSpecialLocation = loc.equals(model.getPizzeria().getLocation()) || loc.equals(model.getRobot().getLocation());
 
             if (!isSpecialLocation) {
                 c = Color.BLACK;

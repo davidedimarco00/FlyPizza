@@ -2,37 +2,38 @@
 
 /*Initial Beliefs*/
 
-//At the beginning the drone knows just where is the pizzeria
+//At the beginning the drone knows just where is the pizzeria, the battery level and the battery drainRate
 
 pizzeriaLocation(26,26).
-
+consumptionRate(1).
 
 
 +!start <-
-    //.print("Drone pronto per ricevere la destinazione, mi trovo nel garage");
     +at(pizzeria);
+    +batteryLevel(100);
     .send(pizzeria, tell, at(pizzeria));  // Invia alla pizzeria che il drone è pronto
-    .send(robot, tell, brokenDrone(drone1, 49,49)).
+    .send(pizzeria, tell, batteryLevel(100)).  // Invia alla pizzeria che il drone è carico
+
+
+    //.send(robot, tell, brokenDrone(drone1, 49,49)).
 
 
 //MOVING PLANS
 +!moveToDestination(D, X, Y) <-
-    //.print(D, " Inizio a muovermi verso la destinazione.");
     -at(pizzeria);
-    .send(pizzeria, achieve, left(D, pizzeria)); //dico alla pizzeria che non sono più dentro la pizzeria
-    //.print(D, "Sto uscendo dalla pizzeria"); //lo mostro a video
+    .send(pizzeria, tell, left(D, pizzeria)); //dico alla pizzeria che non sono più dentro la pizzeria
     move(X,Y);
-    !continueMoving(D, X, Y).  // Adotta un obiettivo intermedio
+    !continueMoving(D, X, Y).
 
 +!continueMoving(D, X, Y) : not at(D, pizzeria) <-  // Piano per continuare a muoversi quando non sono più nella pizzeria
     ?current_position(CurrentX, CurrentY);
-    //.print(D, "Continuo a muovermi verso la destinazione. Current Position: " , CurrentX, " ", "CurrentY", Y);
     if (CurrentX = X & CurrentY = Y) { //se sono arrivato alla destinazione che mi è stata assegnata
         .print("Sono arrivato alla destinazione");
-        .wait(2000); //aspetto 2 s
+        .wait(1000); //aspetto 1 s
         +atDestination(true); //stop del motore
         !deliverPizza(D); //Consegno la pizza
     } else {
+        !decreaseBattery;
         move(X,Y);
         !continueMoving(D,X,Y)
     }.
@@ -40,9 +41,9 @@ pizzeriaLocation(26,26).
 
 //DELIVER PLANS
 +!deliverPizza(D) <-
-    //.print(D," ha consegnato la pizza");
-    .wait(500); //aspetto 2 secondi
+    .print(D," ha consegnato la pizza");
     pizza_delivered;
+    .wait(500);
     ?pizzeriaLocation(LocX, LocY);
     -atDestination(true);
     -order(Drone, X, Y);
@@ -55,25 +56,83 @@ pizzeriaLocation(26,26).
 
 +!moveToPizzeria(D,X,Y) <-
     ?current_position(CurrentX, CurrentY);
+    !decreaseBattery;
     if (CurrentX = X & CurrentY = Y) { //se sono arrivato alla pizzeria
         .wait(2000); //aspetto 2 s
         +at(pizzeria);
+        ?batteryLevel(CurrentBattery);
+        .send(pizzeria, tell, batteryLevel(CurrentBattery)); //dico alla pizzeria il mio livello di carica
         .send(pizzeria, tell, at(pizzeria)); //dico alla pizzeria che sono arrivato
     } else {
         //.print("Sto tornando alla pizzeria");
+        !checkBattery(X,Y);
         move(X,Y);
         !moveToPizzeria(D,X,Y);
     }.
 
 
-//UPDATE BELIEFS
-+!receiveOrder(Drone, X,Y) <- //quando ricevo la credenza di ricevere un ordine.
-    //.print("Ho ricevuto l'ordine di andare a posizione ",X, " ",Y);
 
-    //qui devo abbassare il numero di pizze da consegnare modificando quindi il modello
+
+//BATTERY MANAGEMENT
+
++!checkBattery(DestX, DestY) <-
+    !calculateBatteryRequired(DestX, DestY, RequiredBattery);
+    ?batteryLevel(CurrentBattery);
+    //.println("Batteria attuale: ", CurrentBattery, ", Batteria necessaria: ", RequiredBattery);
+    if (CurrentBattery >= RequiredBattery) {
+        //.println("Batteria sufficiente per raggiungere la destinazione.");
+        -sufficientBattery(_);
+        +sufficientBattery(yes);
+    }
+    else {
+        .println("Batteria insufficiente. È necessario ricaricare.");
+        -sufficientBattery(_);+sufficientBattery(no);
+    }.
+
++!decreaseBattery <-
+    ?batteryLevel(CurrentBattery);
+    {NewBatteryLevel = CurrentBattery - 1};
+    -batteryLevel(CurrentBattery);
+    +batteryLevel(NewBatteryLevel).
+
+
+
++!recharge <-
+    .println("Sto caricando...");
+    .wait(10000);
+    -batteryLevel(_);
+    +batteryLevel(100);
+    .println("Sono carico");
+    .send(pizzeria, tell, batteryLevel(100)).
+
+
+
+
+
+
+//UPDATE BELIEFS
++!receiveOrder(Drone, X, Y) <-
     +order(Drone, X, Y);
-    .wait(2000); //aspetto 2 secondi prima di partire
-    !moveToDestination(Drone, X,Y). //inizio a muovermi verso la destinazione dell'ordine
+    .wait(2000);
+    !checkBattery(X, Y);
+    ?sufficientBattery(Status);
+    if (Status == yes) {
+        .println("Batteria sufficiente. Parto verso la destinazione.");
+        !moveToDestination(Drone,X, Y);
+    }
+    else {
+        .print("Batteria insufficiente. Ricarico");
+        !recharge;
+    }.
+
+
++!calculateBatteryRequired(DestX, DestY, RequiredBattery) <-
+    ?current_position(CurrentX, CurrentY);
+    {DX = DestX - CurrentX};
+    {DY = DestY - CurrentY};
+    {Distance = math.sqrt(DX * DX + DY * DY)};
+    ?consumptionRate(ConsumptionRate);
+    {RequiredBattery = Distance * 2 * ConsumptionRate}.
 
 
 +at(D, pizzeria) <- //quando rilevo che sono in pizzeria
