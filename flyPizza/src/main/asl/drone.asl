@@ -2,31 +2,34 @@
 
 /*Initial Beliefs*/
 
-//At the beginning the drone knows just where is the pizzeria
+//At the beginning the drone knows just where is the pizzeria.
 
 pizzeriaLocation(26,26).
 
 
-
 +!start <-
-    //.print("Drone pronto per ricevere la destinazione, mi trovo nel garage");
-    +at(pizzeria);
-    .send(pizzeria, tell, at(pizzeria));  // Invia alla pizzeria che il drone è pronto
-    .send(robot, tell, brokenDrone(drone1, 49,49)).
+    .my_name(AgentName);
+    +at(pizzeria); +charging(no); +batteryLevel(100); +broken(no);
+    .send(pizzeria, tell, at(pizzeria, AgentName));  //Comunico alla pizzeria che sono in pizzeria
+    .send(pizzeria, tell, charging(no, AgentName)); //Comunico alla pizzeria che non sono in carica
+    .send(pizzeria, tell, batteryLevel(100, AgentName)); //Comunico alla pizzeria che ho la carica al 100%
+    .send(pizzeria, tell, broken(no, AgentName)). //comunico alla pizzeria che non sono rotto
+    //.send(robot, tell, brokenDrone(drone1, 49,49)).
+
+
 
 
 //MOVING PLANS
 +!moveToDestination(D, X, Y) <-
     //.print(D, " Inizio a muovermi verso la destinazione.");
     -at(pizzeria);
-    .send(pizzeria, achieve, left(D, pizzeria)); //dico alla pizzeria che non sono più dentro la pizzeria
+    .send(pizzeria, achieve, left(pizzeria, D)); //dico alla pizzeria che non sono più dentro la pizzeria
     //.print(D, "Sto uscendo dalla pizzeria"); //lo mostro a video
     move(X,Y);
     !continueMoving(D, X, Y).  // Adotta un obiettivo intermedio
 
 +!continueMoving(D, X, Y) : not at(D, pizzeria) <-  // Piano per continuare a muoversi quando non sono più nella pizzeria
     ?current_position(CurrentX, CurrentY);
-    //.print(D, "Continuo a muovermi verso la destinazione. Current Position: " , CurrentX, " ", "CurrentY", Y);
     if (CurrentX = X & CurrentY = Y) { //se sono arrivato alla destinazione che mi è stata assegnata
         .print("Sono arrivato alla destinazione");
         .wait(2000); //aspetto 2 s
@@ -37,18 +40,14 @@ pizzeriaLocation(26,26).
         !continueMoving(D,X,Y)
     }.
 
-
 //DELIVER PLANS
 +!deliverPizza(D) <-
-    //.print(D," ha consegnato la pizza");
-    .wait(500); //aspetto 2 secondi
+    .print(D," ha consegnato la pizza");
     pizza_delivered;
     ?pizzeriaLocation(LocX, LocY);
     -atDestination(true);
-    -order(Drone, X, Y);
+    -order(D, X, Y);
     !moveToPizzeria(D, LocX, LocY).
-
-
 
 
 //RETURN TO PIZZERIA
@@ -56,9 +55,8 @@ pizzeriaLocation(26,26).
 +!moveToPizzeria(D,X,Y) <-
     ?current_position(CurrentX, CurrentY);
     if (CurrentX = X & CurrentY = Y) { //se sono arrivato alla pizzeria
-        .wait(2000); //aspetto 2 s
         +at(pizzeria);
-        .send(pizzeria, tell, at(pizzeria)); //dico alla pizzeria che sono arrivato
+        .send(pizzeria, tell, at(pizzeria, D)); //dico alla pizzeria che sono arrivato
     } else {
         //.print("Sto tornando alla pizzeria");
         move(X,Y);
@@ -71,8 +69,7 @@ pizzeriaLocation(26,26).
     //.print("Ho ricevuto l'ordine di andare a posizione ",X, " ",Y);
 
     //qui devo abbassare il numero di pizze da consegnare modificando quindi il modello
-    +order(Drone, X, Y);
-    .wait(2000); //aspetto 2 secondi prima di partire
+    -order(_,_,_);+order(Drone, X, Y);
     !moveToDestination(Drone, X,Y). //inizio a muovermi verso la destinazione dell'ordine
 
 

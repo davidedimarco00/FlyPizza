@@ -41,11 +41,6 @@ public class FlyPizzaView extends GridWorldView {
         ObjectsID id = ObjectsID.fromValue(object);
 
         switch (id) {
-            case CHARGING_BASE1, CHARGING_BASE2, CHARGING_BASE3:
-                g.setColor(Color.BLUE);
-                this.drawString(g, x, y + 1, this.defaultFont, id.getObjectStringName());
-                super.drawAgent(g, x, y, Color.BLUE, -1);
-                break;
             case PIZZERIA:
                 g.setColor(Color.RED);
                 super.drawAgent(g, x, y, Color.RED, -1);
@@ -69,9 +64,7 @@ public class FlyPizzaView extends GridWorldView {
             //super.drawAgent(g, x, y, c, id);
         } else {
             // Verifica se la posizione è una posizione speciale
-            boolean isSpecialLocation = model.getChargingBases().stream().anyMatch(base -> base.getLocation().equals(loc))
-                    || loc.equals(model.getPizzeria().getLocation())
-                    || loc.equals(model.getRobot().getLocation());
+            boolean isSpecialLocation = loc.equals(model.getPizzeria().getLocation()) || loc.equals(model.getRobot().getLocation());
 
             if (!isSpecialLocation) {
                 c = Color.BLACK;

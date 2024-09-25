@@ -1,7 +1,6 @@
 package env;
 
 import env.objects.ObjectsID;
-import env.objects.chargingBase.ChargingBase;
 import jason.asSyntax.Literal;
 import jason.asSyntax.Structure;
 import jason.asSyntax.Term;
@@ -42,9 +41,6 @@ public class FlyPizzaEnv extends Environment {
     void addInitialPerceptions() {
         for (int i = 0; i < 3; i++) {
             String droneName = "drone" + (i + 1);
-            for (ChargingBase base : this.model.getChargingBases()) {
-                this.addPercept(droneName, Literal.parseLiteral("chargingBase(" + base.getName() + "," + base.getLocation().x + "," + base.getLocation().y + ")"));
-            }
         }
     }
 
@@ -57,9 +53,6 @@ public class FlyPizzaEnv extends Environment {
             // Update drone perceptions
             this.lDrone = model.getAgPos(i);
             this.addPercept(droneName, Literal.parseLiteral("current_position("+lDrone.x + ","+lDrone.y + ")"));
-            for (ChargingBase base : this.model.getChargingBases()) {
-                this.addPercept(droneName, Literal.parseLiteral("chargingBase(" + base.getName() + "," + base.getLocation().x + "," + base.getLocation().y + ")"));
-            }
         }
         this.clearPercepts(ObjectsID.PIZZERIA.getObjectStringName());
         this.clearPercepts(ObjectsID.ROBOT.getObjectStringName());
@@ -91,7 +84,7 @@ public class FlyPizzaEnv extends Environment {
 
         }
         else if (action.getFunctor().equals("pizza_delivered")) {
-            logger.log(Level.INFO, "Ho deliverato una pizza");
+            //logger.log(Level.INFO, "Ho deliverato una pizza");
             this.model.getPizzeria().removePizzas(1);
         }
 

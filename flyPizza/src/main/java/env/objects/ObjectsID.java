@@ -1,9 +1,6 @@
 package env.objects;
 
 public enum ObjectsID {
-    CHARGING_BASE1(16, "Base1", 0),
-    CHARGING_BASE2(32, "Base2", 1),
-    CHARGING_BASE3(64, "Base3", 2),
     PIZZERIA(128, "Pizzeria", 3),
     GARAGE(256, "Garage", 4),
     ROBOT(512, "Robot", 5),
