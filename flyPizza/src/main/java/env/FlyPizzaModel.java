@@ -7,6 +7,7 @@ import env.objects.robot.RescueRobot;
 import env.objects.robot.RobotStatus;
 import jason.environment.grid.GridWorldModel;
 import jason.environment.grid.Location;
+import java.util.concurrent.*;
 
 import java.util.*;
 
@@ -16,9 +17,11 @@ public class FlyPizzaModel extends GridWorldModel {
     private Set<Location> obstacles = new HashSet<>();
     private Pizzeria pizzeria = new Pizzeria(new Location(26, 26), ObjectsID.PIZZERIA.getId());
     private RescueRobot robot = new RescueRobot(new Location(27, 26), 100, RobotStatus.AVAILABLE, ObjectsID.ROBOT.getId());
+    private Map<String, Integer> batteryLevels = new ConcurrentHashMap<>(); //mappa drone(x) -> batteryLevel
 
     private Random random = new Random();
     private NavigationManager navigationManager;
+    private ExecutorService executorService;
 
     static Set<Location> occupiedLocations = new HashSet<>();
 
@@ -28,15 +31,15 @@ public class FlyPizzaModel extends GridWorldModel {
         super(FlyPizzaModel.GSize, FlyPizzaModel.GSize, 5);
         this.navigationManager = new NavigationManager(GSize, obstacles, occupiedLocations, this);
         this.addObjects();
-        //this.initializeDrones(); //is this useful, insert each drone in a separate thread ??
     }
 
     private void addObjects() {
         int numberOfObstacles = 50;
 
-        //Set the position of the drones equals to pizzeria location
+        //Set the position of the drones equals to pizzeria location and set the map of the drones battery
         for (int i = 0; i < 3; i++) {
             this.setAgPos(i, pizzeria.getLocation().x, pizzeria.getLocation().y);
+            this.batteryLevels.put("drone" + String.valueOf(i+1), 2000);
         }
 
         //Add obstacles
@@ -69,6 +72,17 @@ public class FlyPizzaModel extends GridWorldModel {
         this.navigationManager.moveTowards(dest, agentId);
     }
 
+    public void decreaseBatteryLevel(final String agentName) {
+        try {
+            int batteryLevel = batteryLevels.get(agentName);
+            batteryLevels.put(agentName, batteryLevel - 1);
+        } catch (NullPointerException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+
 
     // GETTER E SETTER
 
@@ -90,5 +104,9 @@ public class FlyPizzaModel extends GridWorldModel {
 
     public FlyPizzaView getView() {
         return (FlyPizzaView) this.view;
+    }
+
+    public int getBatteryLevel(String droneName) {
+        return this.batteryLevels.get(droneName);
     }
 }

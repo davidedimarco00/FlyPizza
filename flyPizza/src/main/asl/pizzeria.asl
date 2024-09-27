@@ -13,7 +13,7 @@ consumptionRate(1).
 
 +!waitForOrders <-
     .print("Sono in attesa di ricevere degli ordini....");
-    .wait(7000); //gli ordini partono dopo 5 secondi dall'apertura della pizzeria
+    .wait(5000); //gli ordini partono dopo 5 secondi dall'apertura della pizzeria
     !generateOrders.
 
 +!generateOrders <-
@@ -21,7 +21,7 @@ consumptionRate(1).
     !generateRandomDestination(X, Y); //creo una nuova destinazione casuale
     .print("Nuova destinazione: ", X, " ",Y);
     !checkAvailableDrone(X,Y); //guardo quale drone è disponibile
-    .wait(3000);
+    .wait(2000);
     !generateOrders.
 
 
@@ -38,10 +38,8 @@ consumptionRate(1).
     if (DronesAvailable == []) {
         .print("Nessun drone disponibile in pizzeria per la consegna alla posizione ", X, " ", Y);
         .print("Metto l'ordine in coda...");
-
-    // 4) Aggiungi l'ordine alla coda
+        // 4) Aggiungi l'ordine alla coda
         !enqueueOrder(order(X, Y));
-
         !waitForDrone;
     } else {
         // 5) Assegna l'ordine al primo drone disponibile
@@ -83,16 +81,17 @@ consumptionRate(1).
 //-------------------------------------------------------------------------------------------
 
 +!waitForDrone <-
-    .print("Attendo l'arrivo di qualcuno").
+    .print("Attendo l'arrivo di un drone disponibile").
 
 //----------------------------------------------------------BELIEFS UPDATE------------------------------------
 
 //----------------------------POSITION----------------------------
 +at(pizzeria, D)[source(D)] : orderQueue([]) <- // caso in cui la coda è vuota
-    .print("La coda di ordini e vuota non ci sono ordini");
-    .print(D, " dice di essere alla pizzeria").
+    .print(D, " dice di essere alla pizzeria");
+    .print("La coda di ordini e vuota non ci sono ordini").
 
-+at(pizzeria, D)[source(D)] : orderQueue([_|_]) <- // caso in cui la coda non è vuota
++at(pizzeria, D)[source(D)] : orderQueue([_|_]) <- // caso in cui la coda non è vuotaagentId
+
     !processOrderQueue(D).
 
 
@@ -123,8 +122,12 @@ consumptionRate(1).
 
 //----------------------------CHECK DRONE BATTERY LEVEL----------------------------
 
-+batteryLevel(BatteryLevel, D) <-
-    .print(D, " dice di avere la batteria al ",BatteryLevel).
++!updateBatteryLevel(BatteryLevel, D) <-
+    -batteryLevel(_, D)[source(_)];
+    +batteryLevel(BatteryLevel, D)[source(D)];
+    .print(D, " dice di avere la batteria al ", BatteryLevel).
+
+
 
 +!calculateBatteryRequired(DestX, DestY, RequiredBattery) <-
     ?pizzeriaLocation(PizzaX, PizzaY);
@@ -132,7 +135,7 @@ consumptionRate(1).
     {DY = DestY - PizzaY};
     {Distance = math.sqrt(DX * DX + DY * DY)};
     ?consumptionRate(ConsumptionRate);
-    {RequiredBattery = Distance * 2 * ConsumptionRate}.
+    {RequiredBattery = Distance * 2 * ConsumptionRate}. //considera la batteria necessaria per A/R
 
 
 //----------------------------CUSTOM FUNCTION-------------------------------
