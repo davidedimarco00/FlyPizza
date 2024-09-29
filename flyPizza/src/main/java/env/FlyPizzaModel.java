@@ -39,7 +39,7 @@ public class FlyPizzaModel extends GridWorldModel {
         //Set the position of the drones equals to pizzeria location and set the map of the drones battery
         for (int i = 0; i < 3; i++) {
             this.setAgPos(i, pizzeria.getLocation().x, pizzeria.getLocation().y);
-            this.batteryLevels.put("drone" + String.valueOf(i+1), 2000);
+            this.batteryLevels.put("drone" + String.valueOf(i+1), 100);
         }
 
         //Add obstacles
@@ -72,10 +72,10 @@ public class FlyPizzaModel extends GridWorldModel {
         this.navigationManager.moveTowards(dest, agentId);
     }
 
-    public void decreaseBatteryLevel(final String agentName) {
+    public void decreaseBatteryLevel(final String droneName) {
         try {
-            int batteryLevel = batteryLevels.get(agentName);
-            batteryLevels.put(agentName, batteryLevel - 1);
+            int batteryLevel = batteryLevels.get(droneName);
+            batteryLevels.put(droneName, batteryLevel - 1);
         } catch (NullPointerException e) {
             e.printStackTrace();
         }
@@ -108,5 +108,10 @@ public class FlyPizzaModel extends GridWorldModel {
 
     public int getBatteryLevel(String droneName) {
         return this.batteryLevels.get(droneName);
+    }
+
+    public void setBatteryLevel(String droneName, int batteryLevel) {
+        batteryLevels.put(droneName, batteryLevel);
+        System.out.println("Batteria di " + droneName + " ricaricata al " + batteryLevel);
     }
 }

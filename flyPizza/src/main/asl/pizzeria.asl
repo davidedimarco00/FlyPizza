@@ -17,7 +17,6 @@ consumptionRate(1).
     !generateOrders.
 
 +!generateOrders <-
-    .print("Genero una destinazione...");
     !generateRandomDestination(X, Y); //creo una nuova destinazione casuale
     .print("Nuova destinazione: ", X, " ",Y);
     !checkAvailableDrone(X,Y); //guardo quale drone è disponibile
@@ -31,8 +30,8 @@ consumptionRate(1).
     .print("Batteria necessaria per raggiungere la destinazione: ", RequiredBattery);
 
     //2) assegno la consegna a chi si trova alla pizzeria, non sta ricaricando e ha un livello di batteria utile per la consegna
-    .findall(Drone, (at(pizzeria, Drone) & charging(no, Drone) & batteryLevel(Level,Drone) & Level >= RequiredBattery), DronesAvailable);
-    .print("Droni disponibili in pizzeria: ", DronesAvailable);
+    .findall(Drone, (at(pizzeria, Drone) & charging(no, Drone) & batteryLevel(Level,Drone)[source(Drone)] & Level >= RequiredBattery), DronesAvailable);
+    .print("Droni disponibili in pizzeria PER LA CONSEGNA: ", DronesAvailable);
 
     //3) Verifico se ci sono droni disponibili
     if (DronesAvailable == []) {
@@ -54,8 +53,10 @@ consumptionRate(1).
     .print("Processo la coda degli ordini per ", Drone);
     if (not .empty(orderQueue)) {
         !dequeueOrder(order(X, Y));
-        .print("Assegno ordine dalla coda a ", Drone, ": ", X, " ", Y);
-        !assignOrderTo(Drone, X, Y);
+
+        .print("Provo ad assegnare ordine dalla coda a ", Drone, ": ", X, " ", Y);
+        //!assignOrderTo(Drone, X, Y);
+        !checkAvailableDrone(X, Y);
     } else {
         .print("Nessun ordine in coda da assegnare a ", Drone);
     }.
@@ -87,17 +88,14 @@ consumptionRate(1).
 
 //----------------------------POSITION----------------------------
 +at(pizzeria, D)[source(D)] : orderQueue([]) <- // caso in cui la coda è vuota
-    .print(D, " dice di essere alla pizzeria");
-    .print("La coda di ordini e vuota non ci sono ordini").
+    .print(D, " è in pizzeria, ma la coda di ordini e vuota non ci sono ordini").
 
-+at(pizzeria, D)[source(D)] : orderQueue([_|_]) <- // caso in cui la coda non è vuotaagentId
-
++at(pizzeria, D)[source(D)] : orderQueue([_|_]) <- // caso in cui la coda non è vuota agentId
     !processOrderQueue(D).
 
 
 +!left(pizzeria, D) <-
-    -at(pizzeria, D)[source(D)]; //rimuovo la credenza che il drone sia alla pizzeria
-    .print(D, " dice di aver lasciato la pizzeria").
+    -at(pizzeria, D)[source(D)]. //rimuovo la credenza che il drone sia alla pizzeria
 
 
 //----------------------------CHARGING STATE----------------------------

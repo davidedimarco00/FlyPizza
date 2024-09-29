@@ -46,7 +46,6 @@ public class FlyPizzaEnv extends Environment {
         // Update drone perceptions
         lDrone = model.getAgPos(droneId);
         int batteryLevel = model.getBatteryLevel(droneName);
-
         this.addPercept(droneName, Literal.parseLiteral("current_position(" + lDrone.x + "," + lDrone.y + ")"));
         this.addPercept(droneName, Literal.parseLiteral("batteryLevel(" + batteryLevel + ")"));
     }
@@ -74,6 +73,11 @@ public class FlyPizzaEnv extends Environment {
         } else if (action.getFunctor().equals("pizza_delivered")) {
             // Drone has delivered a pizza
             model.getPizzeria().removePizzas(1);
+        }
+        else if (action.getFunctor().equals("charge_drone")) {
+            Term xTerm = action.getTerm(0);
+            logger.log(Level.INFO, "CHIAMATA A charge drone: " + xTerm.toString());
+            model.setBatteryLevel(xTerm.toString(), 100);
         }
 
         // Update perceptions for this drone

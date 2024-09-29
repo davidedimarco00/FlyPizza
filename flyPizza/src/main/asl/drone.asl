@@ -31,7 +31,6 @@ pizzeriaLocation(26,26).
 +!continueMoving(D, X, Y) : not at(D, pizzeria) <-  // Piano per continuare a muoversi quando non sono più nella pizzeria
     ?current_position(CurrentX, CurrentY);
     if (CurrentX = X & CurrentY = Y) { //se sono arrivato alla destinazione che mi è stata assegnata
-        .print("Sono arrivato alla destinazione");
         +atDestination(true); //stop del motore
         !deliverPizza(D); //Consegno la pizza
     } else {
@@ -70,7 +69,7 @@ pizzeriaLocation(26,26).
     if (CurrentX = X & CurrentY = Y) { //se sono arrivato alla pizzeria
         +at(pizzeria);
         .send(pizzeria, tell, at(pizzeria, D)); //dico alla pizzeria che sono arrivato
-        .print("Sono in pizzeria");
+        .print("Faccio il CHECK DELLA BATTERIA");
         !checkBattery(D);
     } else {
         .wait(200); //aspetto per fare vedere a video il movimento altrimenti va troppo veloce
@@ -85,12 +84,26 @@ pizzeriaLocation(26,26).
     !moveToPizzeria(D, X, Y).
 
 
-//BATTERY PERCEPTION CHECK
+//BATTERY PERCEPTION CHECK AND RECHARGE
 
 +!checkBattery(D) <-
     ?batteryLevel(Level);
     .send(pizzeria, achieve, updateBatteryLevel(Level, D));
-    .print(D,":ha la batteria al ", Level).
+    if (Level <= 30) { //se sono scarico a meno del 30 allora mi metto a caricare
+        -charging(_);+charging(yes); //rimuovo le precedenti credenze e poi lo dico alla pizzeria
+        .send(pizzeria, tell, charging(yes, D));
+        !charge(D);
+    }.
+
+
++!charge(D) <-
+    .wait(5000); //aspetto 10 secondi giusto per simulare la ricarica
+    charge_drone(D); //la batteria viene ricaricata e viene aggiunta la credenza come percezione dall'environment
+    -charging(_);+charging(no); //tolgo le credenze dal drone stesso
+    .send(pizzeria, tell, charging(no, D)); //informo la pizzeria che il drone non è piu in carica
+    .send(pizzeria, achieve, updateBatteryLevel(100,D)).//invio il livello di batteria alla pizzeria
+
+
 
 
 //UPDATE BELIEFS
