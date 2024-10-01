@@ -1,3 +1,5 @@
+
+
 !start.
 
 /*Initial Beliefs*/
@@ -17,10 +19,13 @@ consumptionRate(1).
     !generateOrders.
 
 +!generateOrders <-
-    !generateRandomDestination(X, Y); //creo una nuova destinazione casuale
-    .print("Nuova destinazione: ", X, " ",Y);
-    !checkAvailableDrone(X,Y); //guardo quale drone è disponibile
-    .wait(2000);
+    !generateRandomDestination(X, Y); // Creo una nuova destinazione casuale
+    .print("Nuova destinazione: ", X, " ", Y);
+    !checkAvailableDrone(X, Y);
+    Min = 1000;
+    Max = 5000;
+    WaitTime =  math.random(Max - Min + 1) + Min;
+    .wait(WaitTime);
     !generateOrders.
 
 

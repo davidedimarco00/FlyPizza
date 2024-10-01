@@ -17,8 +17,6 @@ public class FlyPizzaEnv extends Environment {
     final FlyPizzaView view = new FlyPizzaView(model);
 
     private Location lDrone;
-
-
     ExecutorService executorService;
 
 
@@ -40,6 +38,8 @@ public class FlyPizzaEnv extends Environment {
             executorService.submit(handler);
         }
     }
+
+
 
     public synchronized void updateDronePercepts(String droneName, int droneId) {
         this.clearPercepts(droneName);
@@ -76,7 +76,6 @@ public class FlyPizzaEnv extends Environment {
         }
         else if (action.getFunctor().equals("charge_drone")) {
             Term xTerm = action.getTerm(0);
-            logger.log(Level.INFO, "CHIAMATA A charge drone: " + xTerm.toString());
             model.setBatteryLevel(xTerm.toString(), 100);
         }
 
