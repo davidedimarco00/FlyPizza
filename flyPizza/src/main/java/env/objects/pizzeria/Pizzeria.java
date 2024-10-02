@@ -6,7 +6,7 @@ import jason.environment.grid.Location;
 public class Pizzeria {
 
     private final Location location;
-    private final int MAX_PIZZAS = 80;
+    private final int MAX_PIZZAS = 40;
     private int numberOfPizzas = 40;
     private int id;
 
@@ -41,8 +41,13 @@ public class Pizzeria {
         } else {
             return this.numberOfPizzas;
         }
-
     }
+
+    public int getMaxPizzas() {
+        return this.MAX_PIZZAS;
+    }
+
+
 
     @Override
     public String toString() {

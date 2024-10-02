@@ -45,6 +45,9 @@ public class FlyPizzaView extends GridWorldView {
                 g.setColor(Color.RED);
                 super.drawAgent(g, x, y, Color.RED, -1);
                 g.setColor(Color.BLACK);
+                if ( this.model.getPizzeria().getNumberOfPizzas()  <= 0) {
+                    this.drawString(g, x, y+1, this.defaultFont, "Pizze finite!!!!");
+                }
                 this.drawString(g, x, y+1, this.defaultFont, "Pizzeria (" + this.model.getPizzeria().getNumberOfPizzas() + ")");
                 break;
             case ROBOT:

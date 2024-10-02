@@ -18,6 +18,9 @@ public class FlyPizzaModel extends GridWorldModel {
     private Pizzeria pizzeria = new Pizzeria(new Location(26, 26), ObjectsID.PIZZERIA.getId());
     private RescueRobot robot = new RescueRobot(new Location(27, 26), 100, RobotStatus.AVAILABLE, ObjectsID.ROBOT.getId());
     private Map<String, Integer> batteryLevels = new ConcurrentHashMap<>(); //mappa drone(x) -> batteryLevel
+    private Map<String, String> droneBrokenStatus = new HashMap<>(); //,mappa che associa ogni drone allo stato broken
+
+
 
     private Random random = new Random();
     private NavigationManager navigationManager;
@@ -40,6 +43,7 @@ public class FlyPizzaModel extends GridWorldModel {
         for (int i = 0; i < 3; i++) {
             this.setAgPos(i, pizzeria.getLocation().x, pizzeria.getLocation().y);
             this.batteryLevels.put("drone" + String.valueOf(i+1), 100);
+            this.droneBrokenStatus.put("drone" + String.valueOf(i+1), "no");
         }
 
         //Add obstacles
@@ -113,5 +117,13 @@ public class FlyPizzaModel extends GridWorldModel {
     public void setBatteryLevel(String droneName, int batteryLevel) {
         batteryLevels.put(droneName, batteryLevel);
         System.out.println("Batteria di " + droneName + " ricaricata al " + batteryLevel);
+    }
+
+    public String isDroneBroken(String droneName) {
+        return droneBrokenStatus.getOrDefault(droneName, "no");
+    }
+
+    public void setDroneBroken(String droneName, String isBroken) {
+        droneBrokenStatus.put(droneName, isBroken);
     }
 }

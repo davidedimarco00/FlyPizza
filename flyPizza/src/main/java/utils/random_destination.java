@@ -26,7 +26,6 @@ public class random_destination extends DefaultInternalAction {
         Location randomLocation;
 
         // Continua a generare numeri casuali finché non ottieni una posizione libera
-
         do {
             randomValueX = randomGenerator.nextInt(maxRange);
             randomValueY = randomGenerator.nextInt(maxRange);
