@@ -43,7 +43,10 @@ generatedOrders(0).
     //1) guardo quanta batteria serve per arrivare alla destinazione
     !calculateBatteryRequired(X, Y, RequiredBattery);
     //2) assegno la consegna a chi si trova alla pizzeria, non sta ricaricando e ha un livello di batteria utile per la consegna
-    .findall(Drone, (at(pizzeria, Drone) & charging(no, Drone) & batteryLevel(Level,Drone)[source(Drone)] & Level >= RequiredBattery), DronesAvailable);
+    .findall(Drone, (at(pizzeria, Drone) &
+                    charging(no, Drone) &
+                     batteryLevel(Level,Drone)[source(Drone)] &
+                      broken(Drone,no)[source(Drone)] & Level >= RequiredBattery), DronesAvailable);
     .print("Droni disponibili in pizzeria PER LA CONSEGNA: ", DronesAvailable);
 
     //3) Verifico se ci sono droni disponibili
@@ -125,12 +128,12 @@ generatedOrders(0).
 
 
 //----------------------------BROKEN STATE----------------------------
-+broken(no)[source(D)] <-
-    -broken(no, D)[source(D)]. //rimuove la credenza che sia in guasto
++broken(D,no)[source(D)] <-
+    -broken(D, yes)[source(D)]. //rimuove la credenza che sia in guasto
     //.print(D, " dice di NON essere guasto").
 
-+broken(yes)[source(D)] <-
-    -broken(no, D)[source(D)]; //rimuove la credenza che il drone D non sia guasto
++broken(D,yes)[source(D)] <-
+    -broken(D, no)[source(D)]; //rimuove la credenza che il drone D non sia guasto
     .print(D," dice di essere guasto").
 
 

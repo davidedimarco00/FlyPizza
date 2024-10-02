@@ -13,25 +13,25 @@ pizzeriaLocation(26,26).
     .send(pizzeria, tell, charging(no, AgentName)); //Comunico alla pizzeria che non sono in carica
     ?batteryLevel(Level);
     .send(pizzeria, achieve, updateBatteryLevel(Level, AgentName)); //Comunico alla pizzeria che ho la carica al 100%
-    .send(pizzeria, tell, broken(no, AgentName)). //comunico alla pizzeria che non sono rotto
+    .send(pizzeria, tell, broken(AgentName, no)). //comunico alla pizzeria che non sono rotto
     //.send(robot, tell, brokenDrone(drone1, 49,49)).
 
 
 
 
 //MOVING PLANS
-+!moveToDestination(D, X, Y) : not at(D, pizzeria) & charging(no) & broken(no) <-
++!moveToDestination(D, X, Y) : not at(D, pizzeria) & charging(no) & broken(D,no) <-
     -at(pizzeria); //tolgo la credenza che sia alla pizzeria
     .send(pizzeria, achieve, left(pizzeria, D)); //dico alla pizzeria che non sono più dentro la pizzeria
     move(X,Y);
     !continueMoving(D, X, Y).  // obiettivo intermedio (prossimo step)
 
-+!moveToDestination(D, X, Y) : broken(yes) <-
++!moveToDestination(D, X, Y) : broken(D,yes) <-
     .print("Non posso muovermi, SONO ROTTO").
 
 
 
-+!continueMoving(D, X, Y) : not at(D, pizzeria) & charging(no) & broken(no) <-  // Piano per continuare a muoversi quando non sono più nella pizzeria e si ha batteria
++!continueMoving(D, X, Y) : not at(D, pizzeria) & charging(no) & broken(D, no) <-  // Piano per continuare a muoversi quando non sono più nella pizzeria e si ha batteria
     ?current_position(CurrentX, CurrentY);
     if (CurrentX = X & CurrentY = Y) { //se sono arrivato alla destinazione che mi è stata assegnata
         +atDestination(true); //stop del motore
@@ -42,7 +42,7 @@ pizzeriaLocation(26,26).
         !continueMoving(D,X,Y);
     }.
 
-+!continueMoving(D, X, Y) : broken(yes)  <-
++!continueMoving(D, X, Y) : broken(D, yes)  <-
     .print(D, " in attesa di aiuto alla posizione ", X, Y).
 
 
@@ -70,7 +70,7 @@ pizzeriaLocation(26,26).
 
 //RETURN TO PIZZERIA
 
-+!moveToPizzeria(D,X,Y) : not at(D, pizzeria) & charging(no) & broken(no)  <-
++!moveToPizzeria(D,X,Y) : not at(D, pizzeria) & charging(no) & broken(D, no)  <-
     ?current_position(CurrentX, CurrentY);
     if (CurrentX = X & CurrentY = Y) { //se sono arrivato alla pizzeria
         +at(pizzeria);
@@ -83,7 +83,7 @@ pizzeriaLocation(26,26).
     }.
 
 
-+!moveToPizzeria(D,X,Y) : not at(D, pizzeria) & broken(yes)  <-
++!moveToPizzeria(D,X,Y) : not at(D, pizzeria) & broken(D,yes)  <-
     .print("sono rotto!!!!!!!").
 
 
@@ -115,8 +115,8 @@ pizzeriaLocation(26,26).
 
 //---------------------------BROKEN STATE------------------------------------------
 
-+!communicateToPizzeria(CurrentX, CurrentY) <-
-    .send(pizzeria, tell, broken(yes)). //dico alla pizzeria che sono rotto
++!communicateToPizzeria(D, CurrentX, CurrentY) <-
+    .send(pizzeria, tell, broken(D,yes)). //dico alla pizzeria che sono rotto
 
 
 
@@ -131,16 +131,10 @@ pizzeriaLocation(26,26).
 
 
 
++broken(D,yes).
 
-
-
-
-+broken(yes) <-
-    ?current_position(CurrentX, CurrentY);
-    !communicateToPizzeria(CurrentX, CurrentY);
-    .print("Sono guasto alla posizione ", CurrentX, " ", CurrentY).
-    //qui devo mandare un messaggio al robot con la mia posizione che mi deve venire a recuperare.
-
++broken(D,no) <-
+    -broken(D, yes).
 
 /*+at(D, pizzeria) <- //quando rilevo che sono in pizzeria
     .print(D, " Sono in pizzeria."). //lo mostro a video*/

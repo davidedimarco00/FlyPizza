@@ -50,11 +50,13 @@ public class FlyPizzaEnv extends Environment {
         this.clearPercepts(droneName);
         // Update drone perceptions
         lDrone = model.getAgPos(droneId);
-        int batteryLevel = model.getBatteryLevel(droneName);
-        String isBroken = model.isDroneBroken(droneName);
+        if (droneName.contains("drone")) {
+            int batteryLevel = model.getBatteryLevel(droneName);
+            String isBroken = model.isDroneBroken(droneName);
+            this.addPercept(droneName, Literal.parseLiteral("batteryLevel(" + batteryLevel + ")"));
+            this.addPercept(droneName, Literal.parseLiteral("broken(" + droneName + "," + isBroken + ")"));
+        }
         this.addPercept(droneName, Literal.parseLiteral("current_position(" + lDrone.x + "," + lDrone.y + ")"));
-        this.addPercept(droneName, Literal.parseLiteral("batteryLevel(" + batteryLevel + ")"));
-        this.addPercept(droneName, Literal.parseLiteral("broken(" + isBroken + ")"));
 
     }
 
@@ -77,7 +79,9 @@ public class FlyPizzaEnv extends Environment {
                 int x = Integer.parseInt(xTerm.toString());
                 int y = Integer.parseInt(yTerm.toString());
                 model.moveTowards(new Location(x, y), agId); //vado avanti
-                model.decreaseBatteryLevel(ag); //e per ogni passo si scarica la batteria
+                if (ag.contains("drone")) { //se è il drone a muoversi
+                    model.decreaseBatteryLevel(ag); //e per ogni passo si scarica la batteria
+                } //altrimenti vuol dire che il metodo lo sta usando il robot
             } catch (NumberFormatException e) {
                 logger.log(Level.SEVERE, "Error parsing coordinates", e);
                 result = false;
@@ -134,7 +138,7 @@ public class FlyPizzaEnv extends Environment {
         private int droneId;
         private FlyPizzaEnv environment;
         private Random random;
-        private int failureCheckInterval = 6000;
+        private int failureCheckInterval = 10000; //ogni 6000 ms puo verificarsi un guasto
 
         public DroneHandler(String droneName, int droneId, FlyPizzaEnv environment) {
             this.droneName = droneName;
@@ -165,12 +169,10 @@ public class FlyPizzaEnv extends Environment {
         private void simulateRandomFailure() {
             //genera un numero casuale tra 0 e 1
             double randomNumber = random.nextDouble();
-            if (randomNumber < 0.4) {
+            if (randomNumber < 0.2) { //indica la probabilità di rottura
                 if (Objects.equals(model.isDroneBroken(droneName), "no")) { //se non sono rotto allora mi rompo
                     model.setDroneBroken(droneName, "yes");
                     logger.log(Level.INFO, droneName + " si è guastato");
-                } else {
-                    logger.log(Level.INFO, droneName + " gia rotto, non posso romperlo nuovamente");
                 }
             }
         }
