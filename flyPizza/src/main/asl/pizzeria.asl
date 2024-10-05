@@ -109,7 +109,7 @@ generatedOrders(0).
 +at(pizzeria, D)[source(D)] : orderQueue([_|_]) <- // caso in cui la coda non è vuota
     //prima di processare la coda degli ordini
     //aspetto 2 secondi
-    .wait(2000);
+    //.wait(2000);
     !processOrderQueue(D).
 
 

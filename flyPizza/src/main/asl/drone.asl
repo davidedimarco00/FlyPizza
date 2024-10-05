@@ -59,7 +59,7 @@ pizzeriaLocation(26,26).
 
 +!deliverPizza(D) <-
     .print(D," ha consegnato la pizza");
-    .wait(4000); //simulo la consegna
+    //.wait(4000); //simulo la consegna
     pizza_delivered;
     ?pizzeriaLocation(LocX, LocY);
     -atDestination(true);
@@ -89,7 +89,7 @@ pizzeriaLocation(26,26).
 
 -!moveToPizzeria(D, X, Y) <-
     .print("Failed to continue moving. Waiting for position update...");
-    .wait(400);
+    //.wait(400);
     !moveToPizzeria(D, X, Y).
 
 
@@ -98,7 +98,7 @@ pizzeriaLocation(26,26).
 +!checkBattery(D) <-
     ?batteryLevel(Level);
     .send(pizzeria, achieve, updateBatteryLevel(Level, D));
-    if (Level <= 30) { //se sono scarico a meno del 30 allora mi metto a caricare
+    if (Level <= 50) { //se sono scarico a meno del 30 allora mi metto a caricare
         -charging(_);+charging(yes); //rimuovo le precedenti credenze e poi lo dico alla pizzeria
         .send(pizzeria, tell, charging(yes, D));
         !charge(D);
@@ -107,7 +107,7 @@ pizzeriaLocation(26,26).
 
 +!charge(D) <-
     .print(D," IN RICARICA..........");
-    .wait(10000); //aspetto 10 secondi giusto per simulare la ricarica
+    .wait(3000); //aspetto 10 secondi giusto per simulare la ricarica
     charge_drone(D); //la batteria viene ricaricata e viene aggiunta la credenza come percezione dall'environment
     -charging(_);+charging(no); //tolgo le credenze dal drone stesso
     .send(pizzeria, tell, charging(no, D)); //informo la pizzeria che il drone non è piu in carica
