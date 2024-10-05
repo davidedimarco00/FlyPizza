@@ -20,6 +20,7 @@ public class FlyPizzaEnv extends Environment {
     final FlyPizzaView view = new FlyPizzaView(model);
 
     private Location lDrone;
+    private Location lRobot;
     ExecutorService executorService;
 
 
@@ -55,8 +56,11 @@ public class FlyPizzaEnv extends Environment {
             String isBroken = model.isDroneBroken(droneName);
             this.addPercept(droneName, Literal.parseLiteral("batteryLevel(" + batteryLevel + ")"));
             this.addPercept(droneName, Literal.parseLiteral("broken(" + droneName + "," + isBroken + ")"));
+            this.addPercept(droneName, Literal.parseLiteral("current_position(" + lDrone.x + "," + lDrone.y + ")"));
+
         }
-        this.addPercept(droneName, Literal.parseLiteral("current_position(" + lDrone.x + "," + lDrone.y + ")"));
+        this.updateRobotPercepts("robot");
+
 
     }
 
@@ -65,6 +69,14 @@ public class FlyPizzaEnv extends Environment {
         this.clearPercepts(pizzeriaAgentName);
         this.addPercept(pizzeriaAgentName, Literal.parseLiteral("maxPizzas(" + this.model.getPizzeria().getMaxPizzas() + ")"));
     }
+
+    public synchronized void updateRobotPercepts(String robotName) {
+        this.clearPercepts(robotName);
+        lRobot = model.getAgPos(4);
+        this.addPercept(robotName, Literal.parseLiteral("current_position(" + lRobot.x + "," + lRobot.y + ")"));
+    }
+
+
 
     @Override
     public synchronized boolean executeAction(final String ag, final Structure action) {
@@ -95,6 +107,15 @@ public class FlyPizzaEnv extends Environment {
         else if (action.getFunctor().equals("charge_drone")) {
             Term xTerm = action.getTerm(0);
             model.setBatteryLevel(xTerm.toString(), 100);
+        }  else if (action.getFunctor().equals("repair_drone")) {
+            Term xTerm = action.getTerm(0);
+            model.repairDrone(xTerm.toString());
+            model.setAgPos(getAgIdBasedOnName(xTerm.toString()), 26 ,26);
+            model.setBatteryLevel(xTerm.toString(), 100);
+
+        } else if (action.getFunctor().equals("drop_off_drone")) {
+            Term xTerm = action.getTerm(0);
+            //model.dropOffDrone(xTerm.toString());
         }
 
         // Update perceptions for this drone
@@ -169,7 +190,7 @@ public class FlyPizzaEnv extends Environment {
         private void simulateRandomFailure() {
             //genera un numero casuale tra 0 e 1
             double randomNumber = random.nextDouble();
-            if (randomNumber < 0.2) { //indica la probabilità di rottura
+            if (randomNumber < 0.1) { //indica la probabilità di rottura
                 if (Objects.equals(model.isDroneBroken(droneName), "no")) { //se non sono rotto allora mi rompo
                     model.setDroneBroken(droneName, "yes");
                     logger.log(Level.INFO, droneName + " si è guastato");

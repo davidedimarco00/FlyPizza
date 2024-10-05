@@ -28,8 +28,7 @@ public class NavigationManager {
     public void moveTowards(final Location dest, final int agentId) {
         Location agentPosition = model.getAgPos(agentId);
         moveTowardsDestination(dest, agentPosition);
-
-        if (moveIfNotOccupied(agentId, agentPosition)) {
+        if (moveIfNotOccupied(agentId, agentPosition) ) {
             model.getView().update(agentPosition.x, agentPosition.y);
             return;
         }
@@ -39,7 +38,7 @@ public class NavigationManager {
     }
 
     private synchronized boolean moveIfNotOccupied(int agentId, Location agentPosition) {
-        if (!isOccupied(agentPosition, agentId) || isAllowedPosition(agentPosition)) {
+        if ((!isOccupied(agentPosition, agentId) || isAllowedPosition(agentPosition))) {
             model.setAgPos(agentId, agentPosition);
             if (model.getView() != null) {
                 model.getView().update(agentPosition.x, agentPosition.y);
@@ -50,8 +49,7 @@ public class NavigationManager {
     }
 
     private boolean isAllowedPosition(Location loc) {
-        return loc.equals(model.getPizzeria().getLocation()) ||
-                loc.equals(model.getRobot().getLocation());
+        return loc.equals(model.getPizzeria().getLocation());
     }
 
     private Location moveAroundTheObstacle(Location dest, int agentId) {
@@ -105,7 +103,7 @@ public class NavigationManager {
 
     private boolean isOccupied(Location agentPosition, int agentId) {
         for (int i = 0; i < model.getNbOfAgs(); i++) {
-            if (i != agentId && model.getAgPos(i).equals(agentPosition)) {
+            if (i != agentId && model.getAgPos(i).equals(agentPosition) && agentId !=4) {
                 return true;
             }
         }

@@ -50,12 +50,6 @@ public class FlyPizzaView extends GridWorldView {
                 }
                 this.drawString(g, x, y+1, this.defaultFont, "Pizzeria (" + this.model.getPizzeria().getNumberOfPizzas() + ")");
                 break;
-            case ROBOT:
-                g.setColor(Color.ORANGE);
-                super.drawAgent(g, x, y, Color.ORANGE, -1);
-                break;
-            default:
-                break;
         }
     }
 
@@ -64,7 +58,7 @@ public class FlyPizzaView extends GridWorldView {
         Location loc = model.getAgPos(id);
         if (id == 4) { //id del robot
             c = Color.ORANGE;
-            //super.drawAgent(g, x, y, c, id);
+            super.drawAgent(g, x, y, c, id);
         } else {
             // Verifica se la posizione è una posizione speciale
             boolean isSpecialLocation = loc.equals(model.getPizzeria().getLocation()) || loc.equals(model.getRobot().getLocation());

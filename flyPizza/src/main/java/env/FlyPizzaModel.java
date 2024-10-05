@@ -120,10 +120,14 @@ public class FlyPizzaModel extends GridWorldModel {
     }
 
     public String isDroneBroken(String droneName) {
-        return droneBrokenStatus.getOrDefault(droneName, "no");
+        return droneBrokenStatus.get(droneName);
     }
 
     public void setDroneBroken(String droneName, String isBroken) {
         droneBrokenStatus.put(droneName, isBroken);
+    }
+
+    public void repairDrone(String droneName) {
+        droneBrokenStatus.put(droneName, "no");
     }
 }
