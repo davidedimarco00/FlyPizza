@@ -7,60 +7,53 @@
 pizzeriaLocation(26,26). //posizione della pizzeria
 consumptionRate(1).
 generatedOrders(0).
-
+orderQueue([]).
 
 +!start <-
     .print("Pizzeria avviata.");
-    +orderQueue([]);
-    !waitForOrders.
+    !waitForOrders;
+    !generateOrders.
 
 +!waitForOrders <-
     .print("Sono in attesa di ricevere degli ordini....");
-    .wait(5000); //gli ordini partono dopo 5 secondi dall'apertura della pizzeria
-    !generateOrders.
+    .wait(5000). //gli ordini partono dopo 5 secondi dall'apertura della pizzeria
 
 
 +!generateOrders <-
-    ?maxPizzas(NumberOfMaxPizzas); //prendo il numero di pizze massime generabili
-    ?generatedOrders(N); //prendo il numero di ordini generati
-
-    if (N < NumberOfMaxPizzas) { //se il numero di pizze gia ordine è minore del numero massimo di pizze allora
-        !generateRandomDestination(X, Y); // Creo una nuova destinazione casuale
+    ?maxPizzas(NumberOfMaxPizzas);
+    ?generatedOrders(N);
+    if (N < NumberOfMaxPizzas) {
+        !generateRandomDestination(X, Y);
         .print("NUOVO ORDINE: ", X, " ", Y);
-        -generatedOrders(N);+generatedOrders(N+1);
-        !checkAvailableDrone(X, Y, mode2);
+        -generatedOrders(N);
+        +generatedOrders(N + 1);
+        // Mette l'ordine generato direttamente in coda
+        !enqueueOrder(order(X, Y));
+        !processOrderQueue;
+
+        // Genera un nuovo ordine dopo un intervallo di tempo casuale
         Min = 1000;
         Max = 3000;
-        WaitTime =  math.random(Max - Min + 1) + Min;
+        WaitTime = math.random(Max - Min + 1) + Min;
         .wait(WaitTime);
-        !generateOrders;
+        !generateOrders; // Genera il prossimo ordine
     } else {
-        .print("RAGGIUNTO MASSIMO DEGLI ORDINI PRENDIBILI");
+        .print("RAGGIUNTO NUMERO MASSIMO DI ORDINI, SVUOTO LA CODA RIMANENTE");
+        !processRemainingOrders;
     }.
 
 
-+!checkAvailableDrone(X, Y, Mode) <-
-    //1) guardo quanta batteria serve per arrivare alla destinazione
++!checkAvailableDrone(X, Y) <-
     !calculateBatteryRequired(X, Y, RequiredBattery);
-    //2) assegno la consegna a chi si trova alla pizzeria, non sta ricaricando e ha un livello di batteria utile per la consegna
     .findall(Drone, (at(pizzeria, Drone) &
                     charging(no, Drone) &
-                     batteryLevel(Level,Drone)[source(Drone)] &
-                      broken(Drone,no)[source(Drone)] & Level >= RequiredBattery), DronesAvailable);
+                    batteryLevel(Level,Drone)[source(Drone)] &
+                    broken(Drone,no)[source(Drone)] & Level >= RequiredBattery),
+             DronesAvailable);
     .print("Droni disponibili in pizzeria PER LA CONSEGNA: ", DronesAvailable);
-
-    //3) Verifico se ci sono droni disponibili
     if (DronesAvailable == []) {
-        // 4) Aggiungi l'ordine alla coda
-        if (Mode == mode2) { //mode2 è quando viene aggiunto dalla generazione in coda
-            .print("Metto l'ordine in coda...");
-            !enqueueOrder(order(X, Y));
-        } else {
-            !waitForDrone;
-        }
-
+        !enqueueOrderAtFront(order(X, Y));
     } else {
-        // 5) Assegna l'ordine al primo drone disponibile
             [FirstDrone | _] = DronesAvailable;
             !assignOrderTo(FirstDrone, X, Y);
     }.
@@ -68,20 +61,39 @@ generatedOrders(0).
 
 //--------------------------GESTIONE DEGLI ORDINI-------------------------------------------
 
-+!processOrderQueue(Drone) <-
-    .print("Processo la coda degli ordini per ", Drone);
-    if (not .empty(orderQueue)) {
+
++!processOrderQueue <-
+    if (not orderQueue([])) {
+        .print("Processo la coda degli ordini");
         !dequeueOrder(order(X, Y));
-        !checkAvailableDrone(X, Y, mode1);
+        !checkAvailableDrone(X, Y);
+
     } else {
-        .print("Nessun ordine in coda da assegnare a ", Drone);
+        .print("Nessun ordine in coda, ORDINI FINITI!");
     }.
 
-+!enqueueOrder(Order) <-
++!processRemainingOrders <-
+    if (not orderQueue([])) {
+        .print("Elaborazione ordine rimanente in coda...");
+        !dequeueOrder(order(X, Y));
+        !checkAvailableDrone(X, Y);
+        .wait(1000); // Attesa di 1 secondo tra ogni elaborazione di ordine
+        !processRemainingOrders;  // Continua a processare la coda finché ci sono ordini
+    } else {
+        .print("Nessun ordine in coda");
+    }.
+
++!enqueueOrder(order(X, Y)) <-
     -orderQueue(CurrentQueue);
-    !appendOrder(Order, CurrentQueue, NewQueue);
+    !appendOrder(order(X, Y), CurrentQueue, NewQueue);
     +orderQueue(NewQueue);
     .print("Ordine aggiunto alla coda: ", NewQueue).
+
++!enqueueOrderAtFront(order(X, Y)) <-
+    -orderQueue(CurrentQueue);
+    NewQueue = [order(X, Y) | CurrentQueue];
+    +orderQueue(NewQueue);
+    .print("Ordine reinserito in testa alla coda: ", NewQueue).
 
 +!appendOrder(Order, [], [Order]).
 +!appendOrder(Order, [Head | Tail], [Head | NewTail]) <-
@@ -106,11 +118,8 @@ generatedOrders(0).
 +at(pizzeria, D)[source(D)] : orderQueue([]) <- // caso in cui la coda è vuota
     .print(D, " è in pizzeria, ma la coda di ordini e vuota non ci sono ordini").
 
-+at(pizzeria, D)[source(D)] : orderQueue([_|_]) <- // caso in cui la coda non è vuota
-    //prima di processare la coda degli ordini
-    //aspetto 2 secondi
-    //.wait(2000);
-    !processOrderQueue(D).
+/*+at(pizzeria, D)[source(D)] : orderQueue([_|_]) & charging(D,no)[source(D)]  <- // caso in cui la coda non è vuota e non e in carica il drone
+    !processOrderQueue. */
 
 
 +!left(pizzeria, D) <-

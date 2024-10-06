@@ -55,7 +55,7 @@ public class FlyPizzaEnv extends Environment {
             int batteryLevel = model.getBatteryLevel(droneName);
             String isBroken = model.isDroneBroken(droneName);
             this.addPercept(droneName, Literal.parseLiteral("batteryLevel(" + batteryLevel + ")"));
-            this.addPercept(droneName, Literal.parseLiteral("broken(" + droneName + "," + isBroken + ")"));
+            //this.addPercept(droneName, Literal.parseLiteral("broken(" + droneName + "," + isBroken + ")"));
             this.addPercept(droneName, Literal.parseLiteral("current_position(" + lDrone.x + "," + lDrone.y + ")"));
 
         }
@@ -179,7 +179,7 @@ public class FlyPizzaEnv extends Environment {
                         lastFailureCheck = System.currentTimeMillis();
                         simulateRandomFailure();
                     }
-                    Thread.sleep(200L);
+                    Thread.sleep(300L);
                 }
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();

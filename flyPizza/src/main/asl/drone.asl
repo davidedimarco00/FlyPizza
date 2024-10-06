@@ -1,140 +1,88 @@
 !start.
+/* Initial Beliefs */
 
-/*Initial Beliefs*/
-
-//At the beginning the drone knows just where is the pizzeria.
-
+// At the beginning the drone knows just where is the pizzeria.
 pizzeriaLocation(26,26).
 
 +!start <-
     .my_name(AgentName);
-    +at(pizzeria); +charging(no); //+broken(no);
-    .send(pizzeria, tell, at(pizzeria, AgentName));  //Comunico alla pizzeria che sono in pizzeria
-    .send(pizzeria, tell, charging(no, AgentName)); //Comunico alla pizzeria che non sono in carica
+    +charging(no);
+    .send(pizzeria, tell, at(pizzeria, AgentName));  // Comunico alla pizzeria che sono in pizzeria
+    .send(pizzeria, tell, charging(no, AgentName));  // Comunico alla pizzeria che non sono in carica
     ?batteryLevel(Level);
-    .send(pizzeria, achieve, updateBatteryLevel(Level, AgentName)); //Comunico alla pizzeria che ho la carica al 100%
-    .send(pizzeria, tell, broken(AgentName, no)). //comunico alla pizzeria che non sono rotto
-    //.send(robot, tell, brokenDrone(drone1, 49,49)).
+    .send(pizzeria, achieve, updateBatteryLevel(Level, AgentName)); // Comunico alla pizzeria che ho la carica al 100%
+    .send(pizzeria, tell, broken(AgentName, no)).  // Comunico alla pizzeria che non sono rotto
 
+// RECEIVE ORDER AND DELIVERY
 
++!receiveOrder(Drone, X,Y) <-  // QUANDO RICEVO UN ORDINE
+    -order(_,_,_);
+    +order(Drone, X, Y);
+    .send(pizzeria, achieve, left(pizzeria, Drone));
+    !moveToDestination(X,Y);  // Inizio a muovermi verso la destinazione dell'ordine
+    !deliverPizza(Drone);
+    !moveToDestination(26,26);
+    .send(pizzeria, tell, at(pizzeria, Drone));
+    !checkBattery(Drone).
 
+// MOVE TO DESTINATION
 
-//MOVING PLANS
-+!moveToDestination(D, X, Y) : not at(D, pizzeria) & charging(no) & broken(D,no) <-
-    -at(pizzeria); //tolgo la credenza che sia alla pizzeria
-    .send(pizzeria, achieve, left(pizzeria, D)); //dico alla pizzeria che non sono più dentro la pizzeria
-    move(X,Y);
-    !continueMoving(D, X, Y).  // obiettivo intermedio (prossimo step)
-
-+!moveToDestination(D, X, Y) : broken(D,yes) <-
-    .print("Non posso muovermi, SONO ROTTO").
-
-
-
-+!continueMoving(D, X, Y) : not at(D, pizzeria) & charging(no) & broken(D, no) <-  // Piano per continuare a muoversi quando non sono più nella pizzeria e si ha batteria
++!moveToDestination(X, Y) : not broken(_, yes) <-
     ?current_position(CurrentX, CurrentY);
-    if (CurrentX = X & CurrentY = Y) { //se sono arrivato alla destinazione che mi è stata assegnata
-        +atDestination(true); //stop del motore
-        !deliverPizza(D); //Consegno la pizza
+    if (CurrentX = X & CurrentY = Y) {
+        .print("Arrivato a ", X, ", ", Y);
     } else {
         .wait(200);
-        move(X,Y);
-        !continueMoving(D,X,Y);
+        move(X, Y);
+        !moveToDestination(X, Y);
     }.
 
-+!continueMoving(D, X, Y) : broken(D, yes)  <-
-    .print(D, " in attesa di aiuto alla posizione ", X, Y).
+-!moveToDestination(X, Y) <-
+    .print("In attesa della posizione attuale...");
+    !moveToDestination(X,Y).
 
+// DELIVER PIZZA
 
++!deliverPizza(D) : not broken(_, yes) <-  // Controllo che il drone non sia rotto
+    .print(D, " ha consegnato la pizza");
+    .wait(500);  // Simulo la consegna
+    pizza_delivered.
 
--!continueMoving(D, X, Y) <-
-    .print("Waiting for position update...");
-    .wait(400);
-    !continueMoving(D, X, Y).
+// TORNO ALLA PIZZERIA
 
+// QUI RIUSO IL PIANO moveToDestination con le coordinate cambiate
 
+// CHECK DELLA BATTERIA
 
-//DELIVER PLANS
-
-
-+!deliverPizza(D) <-
-    .print(D," ha consegnato la pizza");
-    //.wait(4000); //simulo la consegna
-    pizza_delivered;
-    ?pizzeriaLocation(LocX, LocY);
-    -atDestination(true);
-    -order(D, X, Y);
-    !moveToPizzeria(D, LocX, LocY).
-
-
-
-//RETURN TO PIZZERIA
-
-+!moveToPizzeria(D,X,Y) : not at(D, pizzeria) & charging(no) & broken(D, no)  <-
-    ?current_position(CurrentX, CurrentY);
-    if (CurrentX = X & CurrentY = Y) { //se sono arrivato alla pizzeria
-        +at(pizzeria);
-        .send(pizzeria, tell, at(pizzeria, D)); //dico alla pizzeria che sono arrivato
-        !checkBattery(D);
-    } else {
-        .wait(200); //aspetto per fare vedere a video il movimento altrimenti va troppo veloce
-        move(X,Y);
-        !moveToPizzeria(D,X,Y);
-    }.
-
-
-+!moveToPizzeria(D,X,Y) : not at(D, pizzeria) & broken(D,yes)  <-
-    .print("sono rotto!!!!!!!").
-
-
--!moveToPizzeria(D, X, Y) <-
-    .print("Failed to continue moving. Waiting for position update...");
-    //.wait(400);
-    !moveToPizzeria(D, X, Y).
-
-
-//BATTERY PERCEPTION CHECK AND RECHARGE
-
-+!checkBattery(D) <-
++!checkBattery(D) : not broken(_, yes)  <-  // Controllo che il drone non sia rotto
     ?batteryLevel(Level);
+    .print("FACCIO IL CHECK DELLA BATTERIA ED HO ", Level, "%");
     .send(pizzeria, achieve, updateBatteryLevel(Level, D));
-    if (Level <= 50) { //se sono scarico a meno del 30 allora mi metto a caricare
-        -charging(_);+charging(yes); //rimuovo le precedenti credenze e poi lo dico alla pizzeria
+    if (Level <= 50) {
         .send(pizzeria, tell, charging(yes, D));
         !charge(D);
+    } else {
+        .send(pizzeria, achieve, processOrderQueue);
     }.
 
 
-+!charge(D) <-
-    .print(D," IN RICARICA..........");
-    .wait(3000); //aspetto 10 secondi giusto per simulare la ricarica
-    charge_drone(D); //la batteria viene ricaricata e viene aggiunta la credenza come percezione dall'environment
-    -charging(_);+charging(no); //tolgo le credenze dal drone stesso
-    .send(pizzeria, tell, charging(no, D)); //informo la pizzeria che il drone non è piu in carica
-    .send(pizzeria, achieve, updateBatteryLevel(100,D)).//invio il livello di batteria alla pizzeria
+// NEL CASO SONO SCARICO MI RICARICO
+
++!charge(D) : not broken(_, yes) <-  // Controllo che il drone non sia rotto
+    .print(D, " IN RICARICA............");
+    .wait(4000);  // Aspetto per simulare la ricarica
+    charge_drone(D);  // La batteria viene ricaricata e viene aggiunta la credenza come percezione dall'environment
+    -charging(_);
+    +charging(no);  // Tolgo le credenze dal drone stesso
+    .send(pizzeria, tell, charging(no, D));  // Informo la pizzeria che il drone non è più in carica
+    .send(pizzeria, achieve, updateBatteryLevel(100, D)).
+
 
 //---------------------------BROKEN STATE------------------------------------------
 
-+!communicateToPizzeria(D, CurrentX, CurrentY) <-
-    .send(pizzeria, tell, broken(D,yes)). //dico alla pizzeria che sono rotto
++broken(D, yes) <-
 
+    .print("Il drone è guasto. Tutte le operazioni sono interrotte.").
 
-
-
-
-//UPDATE BELIEFS
-+!receiveOrder(Drone, X,Y) <- //quando ricevo la credenza di ricevere un ordine.
-    -order(_,_,_);
-    +order(Drone, X, Y);
-    !moveToDestination(Drone, X,Y). //inizio a muovermi verso la destinazione dell'ordine
-
-
-
-
-+broken(D,yes).
-
-+broken(D,no) <-
++broken(D, no) <-
     -broken(D, yes).
-
-/*+at(D, pizzeria) <- //quando rilevo che sono in pizzeria
-    .print(D, " Sono in pizzeria."). //lo mostro a video*/

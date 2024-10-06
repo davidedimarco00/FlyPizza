@@ -64,7 +64,14 @@ public class FlyPizzaView extends GridWorldView {
             boolean isSpecialLocation = loc.equals(model.getPizzeria().getLocation()) || loc.equals(model.getRobot().getLocation());
 
             if (!isSpecialLocation) {
-                c = Color.BLACK;
+                if (id == 0) { //drone 1
+                    c = Color.GREEN;
+                } else if (id == 1) { //drone 2
+                    c = Color.magenta;
+                } else if (id == 2) { //drone 3
+                    c = Color.blue;
+                }
+
                 super.drawAgent(g, x, y, c, id);
             }
 
