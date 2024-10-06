@@ -41,6 +41,8 @@ pizzeriaLocation(26,26).
     .print("In attesa della posizione attuale...");
     !moveToDestination(X,Y).
 
+
+
 // DELIVER PIZZA
 
 +!deliverPizza(D) : not broken(_, yes) <-  // Controllo che il drone non sia rotto
@@ -78,11 +80,26 @@ pizzeriaLocation(26,26).
     .send(pizzeria, achieve, updateBatteryLevel(100, D)).
 
 
-//---------------------------BROKEN STATE------------------------------------------
 
-+broken(D, yes) <-
 
-    .print("Il drone è guasto. Tutte le operazioni sono interrotte.").
 
-+broken(D, no) <-
-    -broken(D, yes).
+//SE DURANTE IL TRAGITTO MI ROMPO....
+
+
+//QUANDO RILEVO DI ESSERE ROTTO
+
+
++broken(D, yes) <- //
+    ?current_position(CurrentX, CurrentY);
+    .drop_all_intentions; //https://www.emse.fr/~boissier/enseignement/maop11/doc/jason-api/api/jason/stdlib/drop_all_intentions.html
+    .drop_all_desires;
+    .print("Il drone è guasto a ",CurrentX," ", CurrentY, ". Tutte le INTENZIONI E DESIRED sono interrotti lo dico alla pizzeria e al robot.");
+    .send(robot,tell, brokenDrone(D,CurrentX, CurrentY)).
+
++batteryLevel(Level) <-
+    .my_name(D);
+     if (Level = 100) {
+        .print("Sono qui");
+        .send(pizzeria, tell, at(pizzeria, D));
+     }.
+

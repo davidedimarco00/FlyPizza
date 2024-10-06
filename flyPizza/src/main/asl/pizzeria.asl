@@ -77,8 +77,8 @@ orderQueue([]).
         .print("Elaborazione ordine rimanente in coda...");
         !dequeueOrder(order(X, Y));
         !checkAvailableDrone(X, Y);
-        .wait(1000); // Attesa di 1 secondo tra ogni elaborazione di ordine
-        !processRemainingOrders;  // Continua a processare la coda finché ci sono ordini
+        .wait(1000);
+        !processRemainingOrders;
     } else {
         .print("Nessun ordine in coda");
     }.
@@ -118,8 +118,6 @@ orderQueue([]).
 +at(pizzeria, D)[source(D)] : orderQueue([]) <- // caso in cui la coda è vuota
     .print(D, " è in pizzeria, ma la coda di ordini e vuota non ci sono ordini").
 
-/*+at(pizzeria, D)[source(D)] : orderQueue([_|_]) & charging(D,no)[source(D)]  <- // caso in cui la coda non è vuota e non e in carica il drone
-    !processOrderQueue. */
 
 
 +!left(pizzeria, D) <-

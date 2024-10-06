@@ -55,7 +55,7 @@ public class FlyPizzaEnv extends Environment {
             int batteryLevel = model.getBatteryLevel(droneName);
             String isBroken = model.isDroneBroken(droneName);
             this.addPercept(droneName, Literal.parseLiteral("batteryLevel(" + batteryLevel + ")"));
-            //this.addPercept(droneName, Literal.parseLiteral("broken(" + droneName + "," + isBroken + ")"));
+            this.addPercept(droneName, Literal.parseLiteral("broken(" + droneName + "," + isBroken + ")"));
             this.addPercept(droneName, Literal.parseLiteral("current_position(" + lDrone.x + "," + lDrone.y + ")"));
 
         }
@@ -112,6 +112,7 @@ public class FlyPizzaEnv extends Environment {
             model.repairDrone(xTerm.toString());
             model.setAgPos(getAgIdBasedOnName(xTerm.toString()), 26 ,26);
             model.setBatteryLevel(xTerm.toString(), 100);
+            model.setDroneBroken(xTerm.toString(), "no");
 
         } else if (action.getFunctor().equals("drop_off_drone")) {
             Term xTerm = action.getTerm(0);
@@ -179,7 +180,7 @@ public class FlyPizzaEnv extends Environment {
                         lastFailureCheck = System.currentTimeMillis();
                         simulateRandomFailure();
                     }
-                    Thread.sleep(300L);
+                    Thread.sleep(200);
                 }
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
@@ -190,7 +191,7 @@ public class FlyPizzaEnv extends Environment {
         private void simulateRandomFailure() {
             //genera un numero casuale tra 0 e 1
             double randomNumber = random.nextDouble();
-            if (randomNumber < 0.1) { //indica la probabilità di rottura
+            if (randomNumber < 0.2) { //indica la probabilità di rottura
                 if (Objects.equals(model.isDroneBroken(droneName), "no")) { //se non sono rotto allora mi rompo
                     model.setDroneBroken(droneName, "yes");
                     logger.log(Level.INFO, droneName + " si è guastato");
