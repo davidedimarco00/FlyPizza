@@ -1,4 +1,4 @@
-package env.objects.drone;
+package env.objects;
 
 import jason.environment.grid.Location;
 
@@ -6,7 +6,6 @@ public class Drone {
 
     private Location location;
     private int batteryLevel;
-    private DroneStatus droneStatus;
     private int ID;
     private String name;
 
@@ -27,14 +26,6 @@ public class Drone {
         this.batteryLevel = batteryLevel;
     }
 
-    public DroneStatus getDroneStatus() {
-        return droneStatus;
-    }
-
-    public void setDroneStatus(DroneStatus droneStatus) {
-        this.droneStatus = droneStatus;
-    }
-
     public int getID() {
         return ID;
     }
@@ -47,24 +38,13 @@ public class Drone {
         this.droneName = droneName;
     }
 
-    public EnginePowerMode getEnginePowerMode() {
-        return enginePowerMode;
-    }
-
-    public void setEnginePowerMode(EnginePowerMode enginePowerMode) {
-        this.enginePowerMode = enginePowerMode;
-    }
-
     private String droneName;
-    private EnginePowerMode enginePowerMode;
 
-    public Drone(Location location, DroneStatus droneStatus, int ID, String droneName, EnginePowerMode enginePowerMode) {
+    public Drone(Location location, int ID, String droneName) {
         this.location = location;
         this.batteryLevel = 100; //all drone starts with 100% battery
-        this.droneStatus = droneStatus;
         this.ID = ID;
         this.droneName = droneName;
-        this.enginePowerMode = enginePowerMode;
     }
 
 
@@ -73,7 +53,6 @@ public class Drone {
         return "Drone{" +
                 "location=" + location +
                 ", energyLevel=" + batteryLevel +
-                ", droneStatus=" + droneStatus +
                 ", ID=" + ID +
                 ", droneName='" + droneName + '\'' +
                 '}';

@@ -1,9 +1,8 @@
 package env.objects;
 
 public enum ObjectsID {
-    PIZZERIA(128, "Pizzeria", 3),
-    GARAGE(256, "Garage", 4),
-    ROBOT(512, "Robot", 5),
+    PIZZERIA(32, "Pizzeria", 3),
+    ROBOT(64, "Robot", 4),
     DRONE(1024, "Drone", 6);
 
 

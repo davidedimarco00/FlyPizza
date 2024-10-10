@@ -9,6 +9,9 @@ consumptionRate(1).
 generatedOrders(0).
 orderQueue([]).
 
+
+//LA PIZZERIA PARTE, ASPETTA CHE PASSANO 5 SECONDI PRIMA DI GENERARE ORDINI
+
 +!start <-
     .print("Pizzeria avviata.");
     !waitForOrders;
@@ -19,6 +22,7 @@ orderQueue([]).
     .wait(5000). //gli ordini partono dopo 5 secondi dall'apertura della pizzeria
 
 
+//GENERA ORDINI FINO A NUMERO MAX DI PIZZE, ALTRIMENTI SVUOTA LA CODA RIMANENTE
 +!generateOrders <-
     ?maxPizzas(NumberOfMaxPizzas);
     ?generatedOrders(N);
@@ -43,14 +47,16 @@ orderQueue([]).
     }.
 
 
+
+
 +!checkAvailableDrone(X, Y) <-
     !calculateBatteryRequired(X, Y, RequiredBattery);
     .findall(Drone, (at(pizzeria, Drone) &
                     charging(no, Drone) &
                     batteryLevel(Level,Drone)[source(Drone)] &
-                    broken(Drone,no)[source(Drone)] & Level >= RequiredBattery),
+                    broken(Drone,no) & Level >= RequiredBattery),
              DronesAvailable);
-    .print("Droni disponibili in pizzeria PER LA CONSEGNA: ", DronesAvailable);
+    .print("Droni disponibili in pizzeria PER LA CONSEGNA VERSO ",X," ",Y, " :", DronesAvailable);
     if (DronesAvailable == []) {
         !enqueueOrderAtFront(order(X, Y));
     } else {

@@ -2,9 +2,8 @@ package env;
 
 import env.behavior.NavigationManager;
 import env.objects.ObjectsID;
-import env.objects.pizzeria.Pizzeria;
-import env.objects.robot.RescueRobot;
-import env.objects.robot.RobotStatus;
+import env.objects.Pizzeria;
+import env.objects.RescueRobot;
 import jason.environment.grid.GridWorldModel;
 import jason.environment.grid.Location;
 import java.util.concurrent.*;
@@ -14,17 +13,19 @@ import java.util.*;
 public class FlyPizzaModel extends GridWorldModel {
 
     public static final int GSize = 50;
-    private Set<Location> obstacles = new HashSet<>();
-    private Pizzeria pizzeria = new Pizzeria(new Location(26, 26), ObjectsID.PIZZERIA.getId());
-    private RescueRobot robot = new RescueRobot(new Location(27, 26), 100, RobotStatus.AVAILABLE, ObjectsID.ROBOT.getId());
+    private final int OBSTACLES_NUMBERS = 80;
+    private final Set<Location> obstacles = new HashSet<>();
+    private final Pizzeria pizzeria = new Pizzeria(new Location(26, 26), ObjectsID.PIZZERIA.getId());
+    private final RescueRobot robot = new RescueRobot(new Location(27, 26), 100, ObjectsID.ROBOT.getId());
+
+
     private Map<String, Integer> batteryLevels = new ConcurrentHashMap<>(); //mappa drone(x) -> batteryLevel
     private Map<String, String> droneBrokenStatus = new HashMap<>(); //,mappa che associa ogni drone allo stato broken
 
 
 
-    private Random random = new Random();
-    private NavigationManager navigationManager;
-    private ExecutorService executorService;
+    private final Random random = new Random();
+    private final NavigationManager navigationManager;
 
     static Set<Location> occupiedLocations = new HashSet<>();
 
@@ -37,7 +38,6 @@ public class FlyPizzaModel extends GridWorldModel {
     }
 
     private void addObjects() {
-        int numberOfObstacles = 50;
 
         //Set the position of the drones equals to pizzeria location and set the map of the drones battery
         for (int i = 0; i < 3; i++) {
@@ -47,7 +47,7 @@ public class FlyPizzaModel extends GridWorldModel {
         }
 
         //Add obstacles
-        for (int i = 0; i < numberOfObstacles; i++) {
+        for (int i = 0; i < this.OBSTACLES_NUMBERS; i++) {
             Location location;
             do {
                 location = new Location(random.nextInt(GSize), random.nextInt(GSize));
@@ -116,7 +116,6 @@ public class FlyPizzaModel extends GridWorldModel {
 
     public void setBatteryLevel(String droneName, int batteryLevel) {
         batteryLevels.put(droneName, batteryLevel);
-        System.out.println("Batteria di " + droneName + " ricaricata al " + batteryLevel);
     }
 
     public String isDroneBroken(String droneName) {

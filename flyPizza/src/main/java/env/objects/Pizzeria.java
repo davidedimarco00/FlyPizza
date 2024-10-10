@@ -1,4 +1,4 @@
-package env.objects.pizzeria;
+package env.objects;
 
 
 import jason.environment.grid.Location;

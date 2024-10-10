@@ -31,7 +31,6 @@ subprojects {
 
     dependencies {
         implementation("io.github.jason-lang:interpreter:3.2.0")
-        testImplementation("junit", "junit", "4.13.2")
     }
 
     file(projectDir).listFiles().filter { it.extension == "mas2j" }.forEach { mas2jFile ->

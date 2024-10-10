@@ -62,7 +62,6 @@ public class FlyPizzaView extends GridWorldView {
         } else {
             // Verifica se la posizione è una posizione speciale
             boolean isSpecialLocation = loc.equals(model.getPizzeria().getLocation()) || loc.equals(model.getRobot().getLocation());
-
             if (!isSpecialLocation) {
                 if (id == 0) { //drone 1
                     c = Color.GREEN;

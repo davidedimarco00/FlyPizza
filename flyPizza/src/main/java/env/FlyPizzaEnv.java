@@ -19,6 +19,7 @@ public class FlyPizzaEnv extends Environment {
     final FlyPizzaModel model = new FlyPizzaModel();
     final FlyPizzaView view = new FlyPizzaView(model);
 
+    private final int DRONE_NUMBER = 3;
     private Location lDrone;
     private Location lRobot;
     ExecutorService executorService;
@@ -34,14 +35,14 @@ public class FlyPizzaEnv extends Environment {
         if ((args.length == 1) && args[0].equals("gui")) {
             this.model.setView(view);
         }
-        // Start DroneHandlers for each drone
-        executorService = Executors.newFixedThreadPool(3); // Assuming 3 drones
-        for (int i = 0; i < 3; i++) {
+        //Create a thread for each drone
+        executorService = Executors.newFixedThreadPool(DRONE_NUMBER); // Assuming 3 drones
+        for (int i = 0; i < this.DRONE_NUMBER; i++) {
             String droneName = "drone" + (i + 1);
             DroneHandler handler = new DroneHandler(droneName, i, this);
             executorService.submit(handler);
         }
-        //aggiungo le percezioni alla pizzeria
+        //Add perceptions to pizzeria
         this.updatePizzeriaPercepts();
     }
 
@@ -109,10 +110,11 @@ public class FlyPizzaEnv extends Environment {
             model.setBatteryLevel(xTerm.toString(), 100);
         }  else if (action.getFunctor().equals("repair_drone")) {
             Term xTerm = action.getTerm(0);
+            model.setBatteryLevel(xTerm.toString(), 100);
             model.repairDrone(xTerm.toString());
             model.setAgPos(getAgIdBasedOnName(xTerm.toString()), 26 ,26);
-            model.setBatteryLevel(xTerm.toString(), 100);
-            model.setDroneBroken(xTerm.toString(), "no");
+
+
 
         } else if (action.getFunctor().equals("drop_off_drone")) {
             Term xTerm = action.getTerm(0);
@@ -125,7 +127,7 @@ public class FlyPizzaEnv extends Environment {
         return result;
     }
 
-    private int getAgIdBasedOnName(String agName) {
+    public int getAgIdBasedOnName(String agName) {
         switch (agName) {
             case "drone1":
                 return 0;
@@ -160,13 +162,14 @@ public class FlyPizzaEnv extends Environment {
         private int droneId;
         private FlyPizzaEnv environment;
         private Random random;
-        private int failureCheckInterval = 10000; //ogni 6000 ms puo verificarsi un guasto
+        private int failureCheckInterval;
 
         public DroneHandler(String droneName, int droneId, FlyPizzaEnv environment) {
             this.droneName = droneName;
             this.droneId = droneId;
             this.environment = environment;
             this.random = new Random();
+            this.failureCheckInterval = 10000 + random.nextInt(5000);
         }
 
         @Override
@@ -180,7 +183,7 @@ public class FlyPizzaEnv extends Environment {
                         lastFailureCheck = System.currentTimeMillis();
                         simulateRandomFailure();
                     }
-                    Thread.sleep(200);
+                    Thread.sleep(400);
                 }
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
@@ -191,7 +194,7 @@ public class FlyPizzaEnv extends Environment {
         private void simulateRandomFailure() {
             //genera un numero casuale tra 0 e 1
             double randomNumber = random.nextDouble();
-            if (randomNumber < 0.2) { //indica la probabilità di rottura
+            if (randomNumber < 0.25) { //indica la probabilità di rottura
                 if (Objects.equals(model.isDroneBroken(droneName), "no")) { //se non sono rotto allora mi rompo
                     model.setDroneBroken(droneName, "yes");
                     logger.log(Level.INFO, droneName + " si è guastato");
@@ -200,6 +203,4 @@ public class FlyPizzaEnv extends Environment {
         }
     }
 
-
-    
 }

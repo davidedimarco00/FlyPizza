@@ -16,9 +16,9 @@ pizzeriaLocation(26,26).
 // RECEIVE ORDER AND DELIVERY
 
 +!receiveOrder(Drone, X,Y) <-  // QUANDO RICEVO UN ORDINE
+    .send(pizzeria, achieve, left(pizzeria, Drone));
     -order(_,_,_);
     +order(Drone, X, Y);
-    .send(pizzeria, achieve, left(pizzeria, Drone));
     !moveToDestination(X,Y);  // Inizio a muovermi verso la destinazione dell'ordine
     !deliverPizza(Drone);
     !moveToDestination(26,26);
@@ -29,16 +29,24 @@ pizzeriaLocation(26,26).
 
 +!moveToDestination(X, Y) : not broken(_, yes) <-
     ?current_position(CurrentX, CurrentY);
+    ?batteryLevel(Level);
     if (CurrentX = X & CurrentY = Y) {
         .print("Arrivato a ", X, ", ", Y);
     } else {
         .wait(200);
-        move(X, Y);
-        !moveToDestination(X, Y);
+        if (Level <= 0) { //gestione dell'errore della batteria scarica.
+            -broken(D, _);
+            +broken(D, yes);
+            .print(D, "è GUASTO per BATTERIA SCARICA, sono rotto!");
+        } else {
+            move(X, Y);
+            !moveToDestination(X, Y);
+        }
     }.
 
 -!moveToDestination(X, Y) <-
     .print("In attesa della posizione attuale...");
+    .wait(200);
     !moveToDestination(X,Y).
 
 
@@ -79,6 +87,7 @@ pizzeriaLocation(26,26).
     .send(pizzeria, tell, charging(no, D));  // Informo la pizzeria che il drone non è più in carica
     .send(pizzeria, achieve, updateBatteryLevel(100, D)).
 
+// SE RILEVO DI ESSERE CARICO.....
 
 
 
@@ -93,13 +102,16 @@ pizzeriaLocation(26,26).
     ?current_position(CurrentX, CurrentY);
     .drop_all_intentions; //https://www.emse.fr/~boissier/enseignement/maop11/doc/jason-api/api/jason/stdlib/drop_all_intentions.html
     .drop_all_desires;
-    .print("Il drone è guasto a ",CurrentX," ", CurrentY, ". Tutte le INTENZIONI E DESIRED sono interrotti lo dico alla pizzeria e al robot.");
+    .print("Il ",D," è guasto a ",CurrentX," ", CurrentY, ". Tutte le INTENZIONI E DESIRED sono interrotti lo dico alla pizzeria e al robot.");
     .send(robot,tell, brokenDrone(D,CurrentX, CurrentY)).
 
 +batteryLevel(Level) <-
     .my_name(D);
      if (Level = 100) {
-        .print("Sono qui");
+        -charging(_);
+        +charging(no);
+        .send(pizzeria, tell, charging(no, D));
         .send(pizzeria, tell, at(pizzeria, D));
+
      }.
 

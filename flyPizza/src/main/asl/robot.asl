@@ -12,20 +12,33 @@ busy(no).
 
 /* HANDLE BROKEN DRONE NOTIFICATION */
 +brokenDrone(D, X, Y) : busy(no)  <-
-    -busy(_);+busy(yes);
+    -busy(_);
+    +busy(yes);
     !handleBrokenDrone(D, X, Y).
 
 +brokenDrone(D, X, Y) : busy(yes)  <-
     .print("SONO OCCUPATO IN UN ALTRO RECUPERO").
 
++!processNextBrokenDrone : busy(no) & brokenDrone(D, X, Y) <-
+    .print("GESTISCO IL PROSSIMO DRONE: ", D);
+    -busy(_);
+    +busy(yes);
+    !handleBrokenDrone(D, X, Y).
+
+
++!processNextBrokenDrone : not brokenDrone(D, X, Y) <-
+    .print("NON CI SONO ALTRI DRONI DA RECUPERARE!").
+
+
+
 +!handleBrokenDrone(D, X, Y) <-
-    -at(pizzeria);
     .print("Received notification that ", D, " is broken at position ", X, ", ", Y);
     !moveToLocation(X, Y);
     !pickupDrone(D);
     ?pizzeriaLocation(PX, PY);
     !moveToLocation(PX, PY);
     !dropOffDrone(D).
+
 
 /* MOVEMENT PLAN */
 +!moveToLocation(X, Y) <-
@@ -50,10 +63,9 @@ busy(no).
 +!dropOffDrone(D) <-
     .print("Dropping off drone ", D, " at the pizzeria.");
     //drop_off_drone(D); // Action to drop off the drone
-    +at(pizzeria);
     repair_drone(D);
     -busy(_);
     +busy(no);
-
-    .print(D, " has been repaired and is at the pizzeria.");
-    -brokenDrone(_,_,_)[source(D)].
+    .print(D, " has been repaired and is at the pizzeria. Continue with others if present.");
+    -brokenDrone(_,_,_)[source(D)];
+    !processNextBrokenDrone.
