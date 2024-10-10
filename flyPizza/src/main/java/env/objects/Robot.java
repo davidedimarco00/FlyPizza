@@ -2,13 +2,13 @@ package env.objects;
 
 import jason.environment.grid.Location;
 
-public class RescueRobot {
+public class Robot {
 
 
     private Location location;
     private int id;
 
-    public RescueRobot(Location location, int batteryLevel, int id) {
+    public Robot(Location location, int batteryLevel, int id) {
         this.location = location;
         this.id = id;
     }
