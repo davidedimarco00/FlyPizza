@@ -1,10 +1,8 @@
-package env.behavior;
+package env.model.behavior;
 
-import env.FlyPizzaModel;
+import env.model.FlyPizzaModel;
 import jason.environment.grid.Location;
 
-import java.util.List;
-import java.util.ArrayList;
 import java.util.Random;
 import java.util.Set;
 

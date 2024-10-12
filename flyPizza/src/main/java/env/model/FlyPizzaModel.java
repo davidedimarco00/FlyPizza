@@ -1,9 +1,10 @@
-package env;
+package env.model;
 
-import env.behavior.NavigationManager;
-import env.objects.ObjectsID;
-import env.objects.Pizzeria;
-import env.objects.RescueRobot;
+import env.view.FlyPizzaView;
+import env.model.behavior.NavigationManager;
+import env.model.objects.ObjectsID;
+import env.model.objects.Pizzeria;
+import env.model.objects.Robot;
 import jason.environment.grid.GridWorldModel;
 import jason.environment.grid.Location;
 import java.util.concurrent.*;
@@ -16,7 +17,7 @@ public class FlyPizzaModel extends GridWorldModel {
     private final int OBSTACLES_NUMBERS = 80;
     private final Set<Location> obstacles = new HashSet<>();
     private final Pizzeria pizzeria = new Pizzeria(new Location(26, 26), ObjectsID.PIZZERIA.getId());
-    private final RescueRobot robot = new RescueRobot(new Location(27, 26), 100, ObjectsID.ROBOT.getId());
+    private final Robot robot = new Robot(new Location(27, 26), 100, ObjectsID.ROBOT.getId());
 
 
     private Map<String, Integer> batteryLevels = new ConcurrentHashMap<>(); //mappa drone(x) -> batteryLevel
@@ -102,7 +103,7 @@ public class FlyPizzaModel extends GridWorldModel {
         return pizzeria;
     }
 
-    public RescueRobot getRobot() {
+    public Robot getRobot() {
         return robot;
     }
 

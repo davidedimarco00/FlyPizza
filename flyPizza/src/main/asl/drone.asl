@@ -16,9 +16,9 @@ pizzeriaLocation(26,26).
 // RECEIVE ORDER AND DELIVERY
 
 +!receiveOrder(Drone, X,Y) <-  // QUANDO RICEVO UN ORDINE
-    .send(pizzeria, achieve, left(pizzeria, Drone));
     -order(_,_,_);
     +order(Drone, X, Y);
+    .send(pizzeria, achieve, left(pizzeria, Drone));
     !moveToDestination(X,Y);  // Inizio a muovermi verso la destinazione dell'ordine
     !deliverPizza(Drone);
     !moveToDestination(26,26);

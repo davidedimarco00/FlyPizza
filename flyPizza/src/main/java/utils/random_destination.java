@@ -1,6 +1,6 @@
 package utils;
 
-import env.FlyPizzaModel;
+import env.model.FlyPizzaModel;
 import jason.asSemantics.*;
 import jason.asSyntax.*;
 import jason.JasonException;

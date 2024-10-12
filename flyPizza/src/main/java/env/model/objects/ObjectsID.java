@@ -1,4 +1,4 @@
-package env.objects;
+package env.model.objects;
 
 public enum ObjectsID {
     PIZZERIA(32, "Pizzeria", 3),

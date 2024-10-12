@@ -1,6 +1,7 @@
-package env;
+package env.view;
 
-import env.objects.ObjectsID;
+import env.model.FlyPizzaModel;
+import env.model.objects.ObjectsID;
 import jason.environment.grid.GridWorldView;
 import jason.environment.grid.Location;
 

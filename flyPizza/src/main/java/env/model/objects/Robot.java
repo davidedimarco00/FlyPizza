@@ -1,4 +1,4 @@
-package env.objects;
+package env.model.objects;
 
 import jason.environment.grid.Location;
 

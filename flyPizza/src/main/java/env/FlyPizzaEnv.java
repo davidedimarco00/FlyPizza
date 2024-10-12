@@ -1,5 +1,7 @@
 package env;
 
+import env.model.FlyPizzaModel;
+import env.view.FlyPizzaView;
 import jason.asSyntax.Literal;
 import jason.asSyntax.Structure;
 import jason.asSyntax.Term;
