@@ -115,9 +115,6 @@ public class FlyPizzaEnv extends Environment {
             model.setBatteryLevel(xTerm.toString(), 100);
             model.repairDrone(xTerm.toString());
             model.setAgPos(getAgIdBasedOnName(xTerm.toString()), 26 ,26);
-
-
-
         } else if (action.getFunctor().equals("drop_off_drone")) {
             Term xTerm = action.getTerm(0);
             //model.dropOffDrone(xTerm.toString());
