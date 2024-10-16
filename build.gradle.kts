@@ -1,4 +1,5 @@
 import org.gradle.configurationcache.extensions.capitalized
+import org.gradle.internal.impldep.org.fusesource.jansi.AnsiRenderer.test
 
 plugins {
     java
@@ -17,8 +18,15 @@ allprojects {
         mavenCentral()
     }
 
+
+
     group = "it.project.flypizza"
 }
+
+
+
+
+
 
 subprojects {
     sourceSets {
@@ -29,9 +37,14 @@ subprojects {
         }
     }
 
+
+
     dependencies {
         implementation("io.github.jason-lang:interpreter:3.2.0")
+
+
     }
+
 
     file(projectDir).listFiles().filter { it.extension == "mas2j" }.forEach { mas2jFile ->
         task<JavaExec>("run${mas2jFile.nameWithoutExtension.capitalized()}Mas") {

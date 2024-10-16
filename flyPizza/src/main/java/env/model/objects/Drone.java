@@ -2,12 +2,27 @@ package env.model.objects;
 
 import jason.environment.grid.Location;
 
+import static env.model.objects.EngineMode.LOW;
+
 public class Drone {
 
     private Location location;
     private int batteryLevel;
+    private String broken;
     private int ID;
-    private String name;
+    private String droneName;
+    private EngineMode engineMode;
+
+
+    public Drone(Location location, int ID, String droneName, String broken) {
+        this.location = location;
+        this.batteryLevel = 100; //all drone starts with 100% battery
+        this.ID = ID;
+        this.droneName = droneName;
+        this.broken = broken;
+        this.engineMode = EngineMode.LOW;
+    }
+
 
     public Location getLocation() {
         return location;
@@ -26,6 +41,8 @@ public class Drone {
         this.batteryLevel = batteryLevel;
     }
 
+
+
     public int getID() {
         return ID;
     }
@@ -38,15 +55,22 @@ public class Drone {
         this.droneName = droneName;
     }
 
-    private String droneName;
 
-    public Drone(Location location, int ID, String droneName) {
-        this.location = location;
-        this.batteryLevel = 100; //all drone starts with 100% battery
-        this.ID = ID;
-        this.droneName = droneName;
+    public String getBroken() {
+        return broken;
     }
 
+    public void setBroken(String broken) {
+        this.broken = broken;
+    }
+
+    public EngineMode getEngineMode() {
+        return engineMode;
+    }
+
+    public void setEngineMode(EngineMode engineMode) {
+        this.engineMode = engineMode;
+    }
 
     @Override
     public String toString() {
@@ -57,9 +81,6 @@ public class Drone {
                 ", droneName='" + droneName + '\'' +
                 '}';
     }
-
-
-    
 
 
 

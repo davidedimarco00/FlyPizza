@@ -18,7 +18,7 @@ import java.util.logging.Logger;
 public class FlyPizzaEnv extends Environment {
 
     static Logger logger = Logger.getLogger(FlyPizzaEnv.class.getName());
-    final FlyPizzaModel model = new FlyPizzaModel();
+    final FlyPizzaModel model = new FlyPizzaModel(3);
     final FlyPizzaView view = new FlyPizzaView(model);
 
     private final int DRONE_NUMBER = 3;
