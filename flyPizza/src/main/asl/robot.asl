@@ -47,7 +47,7 @@ busy(no).
         .print("Arrived at destination ", X, ", ", Y);
     } else {
         .wait(200);
-        move(X, Y);
+        move(X, Y,null);
         !moveToLocation(X, Y);
     }.
 

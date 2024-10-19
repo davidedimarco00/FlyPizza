@@ -3,6 +3,7 @@
 
 // At the beginning the drone knows just where is the pizzeria.
 pizzeriaLocation(26,26).
+enginePower(low).
 
 +!start <-
     .my_name(AgentName);
@@ -19,17 +20,41 @@ pizzeriaLocation(26,26).
     -order(_,_,_);
     +order(Drone, X, Y);
     .send(pizzeria, achieve, left(pizzeria, Drone));
-    !moveToDestination(X,Y);  // Inizio a muovermi verso la destinazione dell'ordine
+    ?enginePower(Mode);
+    !moveToDestination(X,Y,Mode);  // Inizio a muovermi verso la destinazione dell'ordine
     !deliverPizza(Drone);
-    !moveToDestination(26,26);
+    ?enginePower(M);
+    !moveToDestination(26,26,M);
     .send(pizzeria, tell, at(pizzeria, Drone));
     !checkBattery(Drone).
 
 // MOVE TO DESTINATION
 
-+!moveToDestination(X, Y) : not broken(_, yes) <-
++!moveToDestination(X, Y, Mode) : not broken(_, yes) <-
     ?current_position(CurrentX, CurrentY);
     ?batteryLevel(Level);
+
+ // Calcola la distanza tra la posizione attuale e la destinazione
+     {Distance = math.sqrt((X - CurrentX) * (X - CurrentX) + (Y - CurrentY) * (Y - CurrentY))};
+
+     // Calcolo del consumo di batteria per la modalita full
+     FullModeBatteryRequired = Distance * 2;  // Modalità FULL consuma 2 unità per unità di distanza
+
+     // Decisione della modalità in base al livello della batteria
+     .print(Level);
+     if (Level >= FullModeBatteryRequired) {
+         !switchToFullPower;
+     } else {
+          if (Level <= FullModeBatteryRequired) {
+             !switchToLowPower;
+         } else {
+             -broken(D, _);
+             +broken(D, yes);
+             .send(pizzeria, tell, broken(D, CurrentX, CurrentY));  // Informo la pizzeria del guasto
+         }
+     };
+
+
     if (CurrentX = X & CurrentY = Y) {
         .print("Arrivato a ", X, ", ", Y);
     } else {
@@ -37,17 +62,20 @@ pizzeriaLocation(26,26).
         if (Level <= 0) { //gestione dell'errore della batteria scarica.
             -broken(D, _);
             +broken(D, yes);
-            .print(D, "è GUASTO per BATTERIA SCARICA, sono rotto!");
+            .print(D, "è GUASTO per BATTERIA SCARICA !");
         } else {
-            move(X, Y);
-            !moveToDestination(X, Y);
+            //check engine performance
+            ?enginePower(M);   //catturo la modalità
+            move(X, Y, M);
+            !moveToDestination(X, Y, M);
         }
     }.
 
--!moveToDestination(X, Y) <-
+-!moveToDestination(X, Y, Mode) <-
     .print("In attesa della posizione attuale...");
     .wait(200);
-    !moveToDestination(X,Y).
+    ?enginePower(M);
+    !moveToDestination(X,Y, M).
 
 
 
@@ -87,12 +115,6 @@ pizzeriaLocation(26,26).
     .send(pizzeria, tell, charging(no, D));  // Informo la pizzeria che il drone non è più in carica
     .send(pizzeria, achieve, updateBatteryLevel(100, D)).
 
-// SE RILEVO DI ESSERE CARICO.....
-
-
-
-
-//SE DURANTE IL TRAGITTO MI ROMPO....
 
 
 //QUANDO RILEVO DI ESSERE ROTTO
@@ -115,3 +137,16 @@ pizzeriaLocation(26,26).
 
      }.
 
+
+//switch tra le varie modalità
+
+
++!switchToFullPower <-
+    -enginePower(low);
+    +enginePower(full);
+    .print("Passo a modalita FULL POWER").
+
++!switchToLowPower <-
+    -enginePower(full);
+    +enginePower(low);
+    .print("Passo a modalita LOW POWER").

@@ -2,8 +2,7 @@ package env.model.objects;
 
 public enum ObjectsID {
     PIZZERIA(32, "Pizzeria", 3),
-    ROBOT(64, "Robot", 4),
-    DRONE(1024, "Drone", 6);
+    ROBOT(64, "Robot", 4);
 
 
     private final int value;

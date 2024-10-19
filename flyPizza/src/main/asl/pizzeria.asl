@@ -58,7 +58,7 @@ orderQueue([]).
              DronesAvailable);
     .print("Droni disponibili in pizzeria PER LA CONSEGNA VERSO ",X," ",Y, " :", DronesAvailable);
     if (DronesAvailable == []) {
-        !enqueueOrderAtFront(order(X, Y));
+        !enqueueOrderAtFront(order(X, Y)); //mette l'ordine di nuovo in testa alla coda
     } else {
             [FirstDrone | _] = DronesAvailable;
             !assignOrderTo(FirstDrone, X, Y);
@@ -164,7 +164,6 @@ orderQueue([]).
     {DX = DestX - PizzaX};
     {DY = DestY - PizzaY};
     {Distance = math.sqrt(DX * DX + DY * DY)};
-    ?consumptionRate(ConsumptionRate);
     ?consumptionRate(ConsumptionRate);
     {RequiredBattery = Distance * 2 * ConsumptionRate}. //considera la batteria necessaria per A/R
 

@@ -41,8 +41,14 @@ subprojects {
 
     dependencies {
         implementation("io.github.jason-lang:interpreter:3.2.0")
+        testImplementation("org.junit.jupiter:junit-jupiter:5.7.1")
+        testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
 
+    }
+
+    tasks.withType<Test> {
+        useJUnitPlatform()
     }
 
 

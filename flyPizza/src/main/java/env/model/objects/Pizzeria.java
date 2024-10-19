@@ -6,11 +6,9 @@ import jason.environment.grid.Location;
 public class Pizzeria {
 
     private final Location location;
-    private final int MAX_PIZZAS = 40;
-    private int numberOfPizzas = 40;
+    private final int MAX_PIZZAS = 40; //indica il numero massimo di ordini (ovvero di pizze ordinabili)
+    private int numberOfPizzas = 40; //indica il numero di pizze attualmente da consegnare, è un contatore
     private int id;
-
-
 
     public Pizzeria(Location location, int id) {
         this.location = location;
@@ -29,25 +27,16 @@ public class Pizzeria {
         return numberOfPizzas;
     }
 
-    public void addPizzas(int count) {
-        this.numberOfPizzas += count;
-    }
-
-    public int removePizzas(int count) {
+    public void removePizzas(int count) {
 
         if (count <= numberOfPizzas) {
             this.numberOfPizzas -= count;
-            return this.numberOfPizzas;
-        } else {
-            return this.numberOfPizzas;
         }
     }
 
     public int getMaxPizzas() {
         return this.MAX_PIZZAS;
     }
-
-
 
     @Override
     public String toString() {

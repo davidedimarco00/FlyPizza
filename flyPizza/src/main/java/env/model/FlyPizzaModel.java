@@ -3,21 +3,21 @@ package env.model;
 import env.model.objects.*;
 import env.view.FlyPizzaView;
 import env.model.behavior.NavigationManager;
-import jade.core.NotFoundException;
 import jason.environment.grid.GridWorldModel;
 import jason.environment.grid.Location;
-import java.util.concurrent.*;
 
 import java.util.*;
 
 public class FlyPizzaModel extends GridWorldModel {
 
     public static final int GSize = 50;
-    private final int OBSTACLES_NUMBERS = 80;
     private final Set<Location> obstacles = new HashSet<>();
-    private List<Drone> drones = new ArrayList();
+    private final List<Drone> drones = new ArrayList<>();
+
+
+
     private final Pizzeria pizzeria = new Pizzeria(new Location(26, 26), ObjectsID.PIZZERIA.getId());
-    private final Robot robot = new Robot(new Location(27, 26), 100, ObjectsID.ROBOT.getId());
+    private final Robot robot = new Robot(new Location(27, 26), ObjectsID.ROBOT.getId());
     private final Random random = new Random();
     private final NavigationManager navigationManager;
     static Set<Location> occupiedLocations = new HashSet<>();
@@ -29,8 +29,6 @@ public class FlyPizzaModel extends GridWorldModel {
     }
 
     private void addObjects(int nDrone) {
-
-        //Set the position of the drones equals to pizzeria location and instance of the drone
         for (int i = 0; i < nDrone; i++) {
             this.setAgPos(i, pizzeria.getLocation().x, pizzeria.getLocation().y);
             //creo il drone
@@ -39,8 +37,9 @@ public class FlyPizzaModel extends GridWorldModel {
             this.drones.add(drone);
         }
 
-        //Add obstacles
-        for (int i = 0; i < this.OBSTACLES_NUMBERS; i++) {
+        //aggiungo gli ostacoli
+        int OBSTACLES_NUMBERS = 80;
+        for (int i = 0; i < OBSTACLES_NUMBERS; i++) {
             Location location;
             do {
                 location = new Location(random.nextInt(GSize), random.nextInt(GSize));
@@ -50,10 +49,10 @@ public class FlyPizzaModel extends GridWorldModel {
         }
 
         //set the pizzeria agent and robot agent location
-        this.setAgPos(3, pizzeria.getLocation());
-        this.setAgPos(4, robot.getLocation());
+        this.setAgPos(pizzeria.getId(), pizzeria.getLocation());
+        this.setAgPos(robot.getId(), robot.getLocation());
 
-        //Add other object in the map
+        //add other objects
         this.add(ObjectsID.PIZZERIA.getValue(), pizzeria.getLocation());
         this.add(ObjectsID.ROBOT.getValue(), robot.getLocation());;
     }
@@ -71,9 +70,15 @@ public class FlyPizzaModel extends GridWorldModel {
         this.navigationManager.moveTowards(dest, agentId);
     }
 
-    public void decreaseBatteryLevel(final String droneName) {
+    public void decreaseBatteryLevel(final String droneName, String mode) {
         Drone drone = this.findDroneByName(droneName);
-        drone.setBatteryLevel(drone.getBatteryLevel() - 1);
+        int drainRate = 10;
+        if (mode.equals("full")) {
+            drainRate = 2;
+        } else if (mode.equals("low")) {
+            drainRate = 1;
+        }
+        drone.setBatteryLevel(drone.getBatteryLevel() - drainRate);
     }
 
 
@@ -116,8 +121,6 @@ public class FlyPizzaModel extends GridWorldModel {
     public void setEngineMode(String droneName, EngineMode engineMode) {
         this.findDroneByName(droneName).setEngineMode(engineMode);
     }
-
-
 
     public String isDroneBroken(String droneName) {
         return findDroneByName(droneName).getBroken();
