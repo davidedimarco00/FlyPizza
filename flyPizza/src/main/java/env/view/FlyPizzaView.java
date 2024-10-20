@@ -29,6 +29,8 @@ public class FlyPizzaView extends GridWorldView {
         if (ObjectsID.fromValue(object) == ObjectsID.PIZZERIA) {
             drawPizzeria(g, x, y);
         }
+
+
     }
 
     private void drawObstacles(final Graphics g) {
@@ -49,16 +51,15 @@ public class FlyPizzaView extends GridWorldView {
             c = Color.ORANGE;
         } else {
             c = getDroneColor(id);
+
         }
 
         if (!isSpecialLocation(model.getAgPos(id))) {
-            super.drawAgent(g, x, y, c, id);
+            super.drawAgent(g, x, y, c, id );
+            this.drawString(g,x,y, Font.getFont(Font.SANS_SERIF),"ciao");
         }
 
-        // Se il drone è alla pizzeria, disegna informazioni aggiuntive
-        if (model.getPizzeria().getLocation().equals(model.getAgPos(id))) {
-            drawString(g, x, y + 1, this.defaultFont, "Pizzeria (" + model.getPizzeria().getNumberOfPizzas() + ")");
-        }
+
     }
 
     private boolean isSpecialLocation(final Location loc) {

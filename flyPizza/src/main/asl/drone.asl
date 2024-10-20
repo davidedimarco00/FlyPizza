@@ -41,7 +41,7 @@ enginePower(low).
      FullModeBatteryRequired = Distance * 2;  // Modalità FULL consuma 2 unità per unità di distanza
 
      // Decisione della modalità in base al livello della batteria
-     .print(Level);
+
      if (Level >= FullModeBatteryRequired) {
          !switchToFullPower;
      } else {
@@ -54,11 +54,16 @@ enginePower(low).
          }
      };
 
-
     if (CurrentX = X & CurrentY = Y) {
         .print("Arrivato a ", X, ", ", Y);
     } else {
-        .wait(200);
+        ?enginePower(M);
+        if (M = full) {
+             .wait(200);
+        } else {
+            .wait(400);
+        }
+
         if (Level <= 0) { //gestione dell'errore della batteria scarica.
             -broken(D, _);
             +broken(D, yes);
@@ -70,6 +75,7 @@ enginePower(low).
             !moveToDestination(X, Y, M);
         }
     }.
+
 
 -!moveToDestination(X, Y, Mode) <-
     .print("In attesa della posizione attuale...");
@@ -143,10 +149,8 @@ enginePower(low).
 
 +!switchToFullPower <-
     -enginePower(low);
-    +enginePower(full);
-    .print("Passo a modalita FULL POWER").
+    +enginePower(full).
 
 +!switchToLowPower <-
     -enginePower(full);
-    +enginePower(low);
-    .print("Passo a modalita LOW POWER").
+    +enginePower(low).

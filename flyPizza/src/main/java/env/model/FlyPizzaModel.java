@@ -114,8 +114,8 @@ public class FlyPizzaModel extends GridWorldModel {
         this.findDroneByName(droneName).setBatteryLevel(batteryLevel);
     }
 
-    public int getEngineMode(String droneName) {
-        return this.findDroneByName(droneName).getBatteryLevel();
+    public EngineMode getEngineMode(String droneName) {
+        return this.findDroneByName(droneName).getEngineMode();
     }
 
     public void setEngineMode(String droneName, EngineMode engineMode) {

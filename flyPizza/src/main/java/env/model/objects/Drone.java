@@ -65,7 +65,7 @@ public class Drone {
     }
 
     public EngineMode getEngineMode() {
-        return engineMode;
+        return this.engineMode;
     }
 
     public void setEngineMode(EngineMode engineMode) {
