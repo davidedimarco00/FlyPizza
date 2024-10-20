@@ -56,7 +56,7 @@ public class NavigationManagerTest {
         assertNotEquals(occupiedLocation, newPosition);
     }
 
-    //check coordinates
+    //verify coordinates
     @Test
     public void testValidateCoords() {
         int validCoord = 5;

@@ -10,7 +10,7 @@ import java.util.*;
 
 public class FlyPizzaModel extends GridWorldModel {
 
-    public static final int GSize = 50;
+    private static final int GSize = 50;
     private final Set<Location> obstacles = new HashSet<>();
     private final List<Drone> drones = new ArrayList<>();
 
@@ -20,7 +20,7 @@ public class FlyPizzaModel extends GridWorldModel {
     private final Robot robot = new Robot(new Location(27, 26), ObjectsID.ROBOT.getId());
     private final Random random = new Random();
     private final NavigationManager navigationManager;
-    static Set<Location> occupiedLocations = new HashSet<>();
+    private static Set<Location> occupiedLocations = new HashSet<>();
 
     public FlyPizzaModel(int nDrone) {
         super(FlyPizzaModel.GSize, FlyPizzaModel.GSize, 5);
@@ -70,16 +70,7 @@ public class FlyPizzaModel extends GridWorldModel {
         this.navigationManager.moveTowards(dest, agentId);
     }
 
-    public void decreaseBatteryLevel(final String droneName, String mode) {
-        Drone drone = this.findDroneByName(droneName);
-        int drainRate = 10;
-        if (mode.equals("full")) {
-            drainRate = 2;
-        } else if (mode.equals("low")) {
-            drainRate = 1;
-        }
-        drone.setBatteryLevel(drone.getBatteryLevel() - drainRate);
-    }
+
 
 
 
@@ -112,6 +103,19 @@ public class FlyPizzaModel extends GridWorldModel {
 
     public void setBatteryLevel(String droneName, int batteryLevel) {
         this.findDroneByName(droneName).setBatteryLevel(batteryLevel);
+    }
+
+    public void decreaseBatteryLevel(final String droneName, String mode) {
+        Drone drone = this.findDroneByName(droneName);
+
+        int drainRate = 0;
+        if (mode.equals("full")) {
+            drainRate = 2;
+        } else if (mode.equals("low")) {
+            drainRate = 1;
+        }
+
+        drone.setBatteryLevel(drone.getBatteryLevel() - drainRate);
     }
 
     public EngineMode getEngineMode(String droneName) {
