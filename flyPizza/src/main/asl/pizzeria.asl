@@ -47,7 +47,7 @@ orderQueue([]).
     }.
 
 
-
+//FA IL CHECK DEL DRONE DISPONIBILE IN PIZZERIA E SE RISPETTA I REQUISITI PER OTTENERE UNA CONSEGNA
 
 +!checkAvailableDrone(X, Y) <-
     !calculateBatteryRequired(X, Y, RequiredBattery);
@@ -113,7 +113,6 @@ orderQueue([]).
     .print("ORDINE ",X, " ", Y," ASSEGNATO A ", Drone);
     .send(Drone, achieve, receiveOrder(Drone, X,Y)).
 
-//-------------------------------------------------------------------------------------------
 
 +!waitForDrone <-
     .print("Attendo l'arrivo di un drone disponibile").
@@ -123,7 +122,6 @@ orderQueue([]).
 //----------------------------POSITION----------------------------
 +at(pizzeria, D)[source(D)] : orderQueue([]) <- // caso in cui la coda è vuota
     .print(D, " è in pizzeria, ma la coda di ordini e vuota non ci sono ordini").
-
 
 
 +!left(pizzeria, D) <-
@@ -143,11 +141,11 @@ orderQueue([]).
 //----------------------------BROKEN STATE----------------------------
 +broken(D,no)[source(D)] <-
     -broken(D, yes)[source(D)]. //rimuove la credenza che sia in guasto
-    //.print(D, " dice di NON essere guasto").
 
 +broken(D,yes)[source(D)] <-
-    -broken(D, no)[source(D)]; //rimuove la credenza che il drone D non sia guasto
-    .print(D," dice di essere guasto").
+    -broken(D, no)[source(D)]. //rimuove la credenza che il drone D non sia guasto
+
+
 
 
 //----------------------------CHECK DRONE BATTERY LEVEL----------------------------
@@ -156,6 +154,11 @@ orderQueue([]).
     -batteryLevel(_, D)[source(_)];
     +batteryLevel(BatteryLevel, D)[source(D)].
     //.print(D, " dice di avere la batteria al ", BatteryLevel).
+
+
++!updateBrokenStatus(D, Value) <-
+    -broken(_, D)[source(_)];
+    +broken(D, Value)[source(D)].
 
 
 

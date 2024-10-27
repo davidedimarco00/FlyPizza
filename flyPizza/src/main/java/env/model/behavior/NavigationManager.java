@@ -14,7 +14,7 @@ public class NavigationManager {
     private final Set<Location> obstacles;
     private final Set<Location> occupiedLocations;
     private final Random random = new Random();
-    private FlyPizzaModel model;
+    private final FlyPizzaModel model;
 
     public NavigationManager(int gridSize, Set<Location> obstacles, Set<Location> occupiedLocations, FlyPizzaModel model) {
         this.GSize = gridSize;

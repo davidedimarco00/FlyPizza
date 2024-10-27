@@ -10,6 +10,7 @@ import jason.asSyntax.Term;
 import jason.environment.Environment;
 import jason.environment.grid.Location;
 
+import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.logging.Level;
@@ -100,7 +101,13 @@ public class FlyPizzaEnv extends Environment {
             model.setBatteryLevel(xTerm.toString(), 100);
             model.repairDrone(xTerm.toString());
             model.setAgPos(getAgIdBasedOnName(xTerm.toString()), 26, 26);
+        } else if (action.getFunctor().equals("break_drone")) {
+            String droneName = action.getTerm(0).toString();
+            if (Objects.equals(model.isDroneBroken(droneName), "no")) { //se non sono rotto allora mi rompo
+                model.setDroneBroken(droneName, "yes");
+            }
         }
+
 
         this.updatePercepts(ag, agId);
 

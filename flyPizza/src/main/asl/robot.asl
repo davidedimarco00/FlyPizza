@@ -2,7 +2,6 @@
 
 
 pizzeriaLocation(26,26).
-at(pizzeria).
 busy(no).
 
 
@@ -12,6 +11,7 @@ busy(no).
 
 /* HANDLE BROKEN DRONE NOTIFICATION */
 +brokenDrone(D, X, Y) : busy(no)  <-
+    .send(pizzeria, achieve, updateBrokenStatus(D,yes));
     -busy(_);
     +busy(yes);
     !handleBrokenDrone(D, X, Y).
@@ -62,10 +62,10 @@ busy(no).
 /* DROP OFF DRONE */
 +!dropOffDrone(D) <-
     .print("Dropping off drone ", D, " at the pizzeria.");
-    //drop_off_drone(D); // Action to drop off the drone
     repair_drone(D);
     -busy(_);
     +busy(no);
+    .send(pizzeria, achieve, updateBrokenStatus(D, no));
     .print(D, " has been repaired and is at the pizzeria. Continue with others if present.");
     -brokenDrone(_,_,_)[source(D)];
     !processNextBrokenDrone.

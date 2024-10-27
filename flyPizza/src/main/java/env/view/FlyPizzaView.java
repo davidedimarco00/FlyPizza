@@ -56,7 +56,7 @@ public class FlyPizzaView extends GridWorldView {
 
         if (!isSpecialLocation(model.getAgPos(id))) {
             super.drawAgent(g, x, y, c, id );
-            this.drawString(g,x,y, Font.getFont(Font.SANS_SERIF),"ciao");
+
         }
 
 

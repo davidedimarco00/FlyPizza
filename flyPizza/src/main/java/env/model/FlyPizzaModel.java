@@ -139,6 +139,7 @@ public class FlyPizzaModel extends GridWorldModel {
     }
 
     private Drone findDroneByName(String droneName) throws NullPointerException {
+
         for (Drone d : this.drones) {
             if (d.getDroneName().equals(droneName)) {
                 return d;

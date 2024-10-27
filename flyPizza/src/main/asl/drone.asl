@@ -33,7 +33,7 @@ enginePower(low).
 +!moveToDestination(X, Y, Mode) : not broken(_, yes) <-
     ?current_position(CurrentX, CurrentY);
     ?batteryLevel(Level);
-
+    .my_name(D);
  // Calcola la distanza tra la posizione attuale e la destinazione
      {Distance = math.sqrt((X - CurrentX) * (X - CurrentX) + (Y - CurrentY) * (Y - CurrentY))};
 
@@ -65,8 +65,7 @@ enginePower(low).
         }
 
         if (Level <= 0) { //gestione dell'errore della batteria scarica.
-            -broken(D, _);
-            +broken(D, yes);
+             break_drone(D);
             .print(D, "è GUASTO per BATTERIA SCARICA !");
         } else {
             //check engine performance
@@ -114,12 +113,12 @@ enginePower(low).
 
 +!charge(D) : not broken(_, yes) <-  // Controllo che il drone non sia rotto
     .print(D, " IN RICARICA............");
-    .wait(4000);  // Aspetto per simulare la ricarica
+    .wait(2000);  // Aspetto per simulare la ricarica
     charge_drone(D);  // La batteria viene ricaricata e viene aggiunta la credenza come percezione dall'environment
     -charging(_);
     +charging(no);  // Tolgo le credenze dal drone stesso
-    .send(pizzeria, tell, charging(no, D));  // Informo la pizzeria che il drone non è più in carica
-    .send(pizzeria, achieve, updateBatteryLevel(100, D)).
+    .send(pizzeria, tell, charging(no, D)).  // Informo la pizzeria che il drone non è più in carica
+
 
 
 
@@ -130,8 +129,11 @@ enginePower(low).
     ?current_position(CurrentX, CurrentY);
     .drop_all_intentions; //https://www.emse.fr/~boissier/enseignement/maop11/doc/jason-api/api/jason/stdlib/drop_all_intentions.html
     .drop_all_desires;
+    .my_name(D);
     .print("Il ",D," è guasto a ",CurrentX," ", CurrentY, ". Tutte le INTENZIONI E DESIRED sono interrotti lo dico alla pizzeria e al robot.");
+    //.send(pizzeria,tell, brokenDrone(D,CurrentX, CurrentY)).
     .send(robot,tell, brokenDrone(D,CurrentX, CurrentY)).
+
 
 +batteryLevel(Level) <-
     .my_name(D);
@@ -140,6 +142,7 @@ enginePower(low).
         +charging(no);
         .send(pizzeria, tell, charging(no, D));
         .send(pizzeria, tell, at(pizzeria, D));
+        .send(pizzeria, achieve, updateBatteryLevel(100, D));
 
      }.
 
