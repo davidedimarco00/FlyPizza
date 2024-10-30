@@ -70,7 +70,7 @@ orderQueue([]).
 
 +!processOrderQueue <-
     if (not orderQueue([])) {
-        .print("Processo la coda degli ordini");
+        .print("Process Order Queue");
         !dequeueOrder(order(X, Y));
         !checkAvailableDrone(X, Y);
 
@@ -80,28 +80,29 @@ orderQueue([]).
 
 +!processRemainingOrders <-
     if (not orderQueue([])) {
-        .print("Elaborazione ordine rimanente in coda...");
+        .print("process remaining orders...");
         !dequeueOrder(order(X, Y));
         !checkAvailableDrone(X, Y);
         .wait(1000);
         !processRemainingOrders;
     } else {
-        .print("Nessun ordine in coda");
+        .print("Queue is empty");
     }.
 
 +!enqueueOrder(order(X, Y)) <-
     -orderQueue(CurrentQueue);
     !appendOrder(order(X, Y), CurrentQueue, NewQueue);
     +orderQueue(NewQueue);
-    .print("Ordine aggiunto alla coda: ", NewQueue).
+    .print("Order added to queue: ", NewQueue).
 
 +!enqueueOrderAtFront(order(X, Y)) <-
     -orderQueue(CurrentQueue);
     NewQueue = [order(X, Y) | CurrentQueue];
     +orderQueue(NewQueue);
-    .print("Ordine reinserito in testa alla coda: ", NewQueue).
+    .print("Order reinsertion at the front: ", NewQueue).
 
 +!appendOrder(Order, [], [Order]).
+
 +!appendOrder(Order, [Head | Tail], [Head | NewTail]) <-
     !appendOrder(Order, Tail, NewTail).
 
@@ -110,7 +111,7 @@ orderQueue([]).
     +orderQueue(RestQueue).
 
 +!assignOrderTo(Drone, X,Y) <-
-    .print("ORDINE ",X, " ", Y," ASSEGNATO A ", Drone);
+    .print("ORDER ",X, " ", Y," ASSIGNED TO ", Drone);
     .send(Drone, achieve, receiveOrder(Drone, X,Y)).
 
 

@@ -39,12 +39,12 @@ public class DroneHandler implements Runnable {
     }
 
     private void simulateRandomFailure() {
-        //genera un numero casuale tra 0 e 1
+        //generate random number between 0 and 1
         double randomNumber = random.nextDouble();
-        if (randomNumber < 0.25) { //indica la probabilità di rottura nel mio caso 0.25 = 25%
-            if (Objects.equals(model.isDroneBroken(droneName), "no")) { //se non sono rotto allora mi rompo
+        if (randomNumber < 0.25) { //0.25 corresponds to 25% probability
+            if (Objects.equals(model.isDroneBroken(droneName), "no")) { //if the drone is not broken I broke it
                 model.setDroneBroken(droneName, "yes");
-                logger.info(droneName + " si è guastato");
+                logger.info(droneName + " is BROKEN");
             }
         }
     }
