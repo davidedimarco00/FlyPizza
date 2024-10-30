@@ -31,13 +31,13 @@ public class FlyPizzaModel extends GridWorldModel {
     private void addObjects(int nDrone) {
         for (int i = 0; i < nDrone; i++) {
             this.setAgPos(i, pizzeria.getLocation().x, pizzeria.getLocation().y);
-            //creo il drone
+            //create drone
             Drone drone = new Drone(pizzeria.getLocation(), i, "drone"+(i+1),"no");
-            //lo aggiungo alla lista di droni
+            //add it to the drone list
             this.drones.add(drone);
         }
 
-        //aggiungo gli ostacoli
+        //add obstacles
         int OBSTACLES_NUMBERS = 80;
         for (int i = 0; i < OBSTACLES_NUMBERS; i++) {
             Location location;
@@ -71,11 +71,7 @@ public class FlyPizzaModel extends GridWorldModel {
     }
 
 
-
-
-
-
-    // GETTER E SETTER
+    // GETTER AND SETTER
 
     public static Set<Location> getOccupiedLocations() {
         return occupiedLocations;

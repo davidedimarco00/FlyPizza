@@ -6,8 +6,8 @@ import jason.environment.grid.Location;
 public class Pizzeria {
 
     private final Location location;
-    private final int MAX_PIZZAS = 40; //indica il numero massimo di ordini (ovvero di pizze ordinabili)
-    private int numberOfPizzas = 40; //indica il numero di pizze attualmente da consegnare, è un contatore
+    private final int MAX_PIZZAS = 40;
+    private int numberOfPizzas = 40; //it's a counter
     private int id;
 
     public Pizzeria(Location location, int id) {

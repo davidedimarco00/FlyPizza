@@ -4,50 +4,49 @@
 
 /*Initial Beliefs*/
 
-pizzeriaLocation(26,26). //posizione della pizzeria
+pizzeriaLocation(26,26).
 consumptionRate(1).
 generatedOrders(0).
 orderQueue([]).
 
 
-//LA PIZZERIA PARTE, ASPETTA CHE PASSANO 5 SECONDI PRIMA DI GENERARE ORDINI
+//PIZZERIA STARTS AND WAIT 5 SECONDS
 
 +!start <-
-    .print("Pizzeria avviata.");
+    .print("Pizzeria started");
     !waitForOrders;
     !generateOrders.
 
 +!waitForOrders <-
-    .print("Sono in attesa di ricevere degli ordini....");
-    .wait(5000). //gli ordini partono dopo 5 secondi dall'apertura della pizzeria
+    .print("Waiting orders...");
+    .wait(5000).
 
 
-//GENERA ORDINI FINO A NUMERO MAX DI PIZZE, ALTRIMENTI SVUOTA LA CODA RIMANENTE
+
 +!generateOrders <-
     ?maxPizzas(NumberOfMaxPizzas);
     ?generatedOrders(N);
     if (N < NumberOfMaxPizzas) {
         !generateRandomDestination(X, Y);
-        .print("NUOVO ORDINE: ", X, " ", Y);
+        .print("New order: ", X, " ", Y);
         -generatedOrders(N);
         +generatedOrders(N + 1);
-        // Mette l'ordine generato direttamente in coda
         !enqueueOrder(order(X, Y));
         !processOrderQueue;
 
-        // Genera un nuovo ordine dopo un intervallo di tempo casuale
+        //generate new order at random time
         Min = 1000;
         Max = 3000;
         WaitTime = math.random(Max - Min + 1) + Min;
         .wait(WaitTime);
-        !generateOrders; // Genera il prossimo ordine
+        !generateOrders; //generate next order
     } else {
-        .print("RAGGIUNTO NUMERO MASSIMO DI ORDINI, SVUOTO LA CODA RIMANENTE");
+        .print("MAXIMUM NUMBER OF ORDERS REACHED, CLEARING REMAINING QUEUE");
         !processRemainingOrders;
     }.
 
 
-//FA IL CHECK DEL DRONE DISPONIBILE IN PIZZERIA E SE RISPETTA I REQUISITI PER OTTENERE UNA CONSEGNA
+//CHECK AVAILABLE DRONE AND ASSIGN DELIVERY
 
 +!checkAvailableDrone(X, Y) <-
     !calculateBatteryRequired(X, Y, RequiredBattery);
@@ -56,9 +55,9 @@ orderQueue([]).
                     batteryLevel(Level,Drone)[source(Drone)] &
                     broken(Drone,no) & Level >= RequiredBattery),
              DronesAvailable);
-    .print("Droni disponibili in pizzeria PER LA CONSEGNA VERSO ",X," ",Y, " :", DronesAvailable);
+    .print("Drones available for the delivery at ",X," ",Y, " :", DronesAvailable);
     if (DronesAvailable == []) {
-        !enqueueOrderAtFront(order(X, Y)); //mette l'ordine di nuovo in testa alla coda
+        !enqueueOrderAtFront(order(X, Y)); //enqueue order at front
     } else {
             [FirstDrone | _] = DronesAvailable;
             !assignOrderTo(FirstDrone, X, Y);
@@ -116,35 +115,34 @@ orderQueue([]).
 
 
 +!waitForDrone <-
-    .print("Attendo l'arrivo di un drone disponibile").
+    .print("Waiting for available drone...").
 
 //----------------------------------------------------------BELIEFS UPDATE------------------------------------
 
 //----------------------------POSITION----------------------------
-+at(pizzeria, D)[source(D)] : orderQueue([]) <- // caso in cui la coda è vuota
-    .print(D, " è in pizzeria, ma la coda di ordini e vuota non ci sono ordini").
++at(pizzeria, D)[source(D)] : orderQueue([]) <-
+    .print(D, " is at pizzeria but queue order is empty").
 
 
 +!left(pizzeria, D) <-
-    -at(pizzeria, D)[source(D)]. //rimuovo la credenza che il drone sia alla pizzeria
+    -at(pizzeria, D)[source(D)].
 
 
 //----------------------------CHARGING STATE----------------------------
 +charging(no, D)[source(D)] <-
-    -charging(yes, D)[source(D)]. //rimuove la credenza che sia in carica
-    //.print(D, " dice di NON essere in carica").
+    -charging(yes, D)[source(D)].
 
 +charging(yes, D)[source(D)] <-
-    -charging(no, D)[source(D)]. //rimuove la credenza che il drone D non sia in carica
+    -charging(no, D)[source(D)].
     //.print(D, " dice di essere in carica").
 
 
 //----------------------------BROKEN STATE----------------------------
 +broken(D,no)[source(D)] <-
-    -broken(D, yes)[source(D)]. //rimuove la credenza che sia in guasto
+    -broken(D, yes)[source(D)].
 
 +broken(D,yes)[source(D)] <-
-    -broken(D, no)[source(D)]. //rimuove la credenza che il drone D non sia guasto
+    -broken(D, no)[source(D)].
 
 
 
@@ -154,7 +152,6 @@ orderQueue([]).
 +!updateBatteryLevel(BatteryLevel, D) <-
     -batteryLevel(_, D)[source(_)];
     +batteryLevel(BatteryLevel, D)[source(D)].
-    //.print(D, " dice di avere la batteria al ", BatteryLevel).
 
 
 +!updateBrokenStatus(D, Value) <-
@@ -169,7 +166,7 @@ orderQueue([]).
     {DY = DestY - PizzaY};
     {Distance = math.sqrt(DX * DX + DY * DY)};
     ?consumptionRate(ConsumptionRate);
-    {RequiredBattery = Distance * 2 * ConsumptionRate}. //considera la batteria necessaria per A/R
+    {RequiredBattery = Distance * 2 * ConsumptionRate}.
 
 
 //----------------------------CUSTOM FUNCTION-------------------------------

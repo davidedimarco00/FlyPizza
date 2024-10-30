@@ -29,9 +29,9 @@ public class FlyPizzaEnv extends Environment {
         if ((args.length == 1) && args[0].equals("gui")) {
             this.model.setView(view);
         }
-        //crea un thread per ogni drone
+        //create a thread for each drone
         int DRONE_NUMBER = 3;
-        executorService = Executors.newFixedThreadPool(DRONE_NUMBER); // 3 droni
+        executorService = Executors.newFixedThreadPool(DRONE_NUMBER); // 3 drones
         for (int i = 0; i < DRONE_NUMBER; i++) {
             String droneName = "drone" + (i + 1);
             DroneHandler handler = new DroneHandler(droneName, i, this, model, logger);
@@ -42,7 +42,7 @@ public class FlyPizzaEnv extends Environment {
 
     public synchronized void updatePercepts(String droneName, int droneId) {
         this.clearPercepts(droneName);
-        // Aggiorna le percezioni del drone
+        //update perceptions
         Location lDrone = model.getAgPos(droneId);
         if (droneName.contains("drone")) {
             int batteryLevel = model.getBatteryLevel(droneName);
@@ -81,12 +81,12 @@ public class FlyPizzaEnv extends Environment {
                 String mode = zTerm.toString();
 
 
-                model.moveTowards(new Location(x, y), agId); // Movimento
-                if (ag.contains("drone")) { // Se si muove un drone
-                    model.decreaseBatteryLevel(ag, mode); // Riduce il livello della batteria in base al mode
+                model.moveTowards(new Location(x, y), agId);
+                if (ag.contains("drone")) { //if drone is moving
+                    model.decreaseBatteryLevel(ag, mode); //reduce level depending on mode FULL or LOW
                 }
             } catch (NumberFormatException e) {
-                logger.log(Level.SEVERE, "Errore nel parsing delle coordinate", e);
+                logger.log(Level.SEVERE, "Errore in parsing coordinates", e);
                 result = false;
             } catch (Exception e) {
                 throw new RuntimeException(e);
@@ -94,7 +94,7 @@ public class FlyPizzaEnv extends Environment {
         } else if (action.getFunctor().equals("pizza_delivered")) {
             model.getPizzeria().removePizzas(1);
         } else if (action.getFunctor().equals("charge_drone")) {
-            Term xTerm = action.getTerm(0); //nome del droone
+            Term xTerm = action.getTerm(0);
             model.setBatteryLevel(xTerm.toString(), 100);
         } else if (action.getFunctor().equals("repair_drone")) {
             Term xTerm = action.getTerm(0);
@@ -103,12 +103,10 @@ public class FlyPizzaEnv extends Environment {
             model.setAgPos(getAgIdBasedOnName(xTerm.toString()), 26, 26);
         } else if (action.getFunctor().equals("break_drone")) {
             String droneName = action.getTerm(0).toString();
-            if (Objects.equals(model.isDroneBroken(droneName), "no")) { //se non sono rotto allora mi rompo
+            if (Objects.equals(model.isDroneBroken(droneName), "no")) {
                 model.setDroneBroken(droneName, "yes");
             }
         }
-
-
         this.updatePercepts(ag, agId);
 
         return result;

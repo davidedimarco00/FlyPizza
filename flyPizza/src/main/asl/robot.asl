@@ -17,17 +17,17 @@ busy(no).
     !handleBrokenDrone(D, X, Y).
 
 +brokenDrone(D, X, Y) : busy(yes)  <-
-    .print("SONO OCCUPATO IN UN ALTRO RECUPERO").
+    .print("I am busy in another recovery").
 
 +!processNextBrokenDrone : busy(no) & brokenDrone(D, X, Y) <-
-    .print("GESTISCO IL PROSSIMO DRONE: ", D);
+    .print("HANDLE NEXT DRONE ", D);
     -busy(_);
     +busy(yes);
     !handleBrokenDrone(D, X, Y).
 
 
 +!processNextBrokenDrone : not brokenDrone(D, X, Y) <-
-    .print("NON CI SONO ALTRI DRONI DA RECUPERARE!").
+    .print("No more drone to recover!").
 
 
 
@@ -57,7 +57,6 @@ busy(no).
 /* PICK UP DRONE */
 +!pickupDrone(D) <-
     .print("Picking up drone ", D).
-    //pick_up_drone(D); // Action to pick up the drone
 
 /* DROP OFF DRONE */
 +!dropOffDrone(D) <-

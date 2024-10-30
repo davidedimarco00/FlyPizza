@@ -71,7 +71,7 @@ public class FlyPizzaView extends GridWorldView {
             case 0: return Color.GREEN;   //drone 1
             case 1: return Color.MAGENTA; //drone 2
             case 2: return Color.CYAN;    //drone 3
-            default: return Color.GRAY;   //colore di default
+            default: return Color.GRAY;   //default color
         }
     }
 }
