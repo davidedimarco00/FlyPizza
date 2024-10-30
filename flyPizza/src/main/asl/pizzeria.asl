@@ -75,7 +75,7 @@ orderQueue([]).
         !checkAvailableDrone(X, Y);
 
     } else {
-        .print("Nessun ordine in coda, ORDINI FINITI!");
+        .print("No order in queue, FINISH!");
     }.
 
 +!processRemainingOrders <-
